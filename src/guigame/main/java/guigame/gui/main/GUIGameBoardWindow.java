@@ -40,23 +40,36 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
     private void init() {
         this.setSize(this.guiGameBoard.getWidth(), this.guiGameBoard.getHeight());
         this.setLocationRelativeTo(null);
-        this.initNextPoint(true);
+        this.initNextPoint(true, false);
     }
 
     /**
+     * Potentially wait 5 seconds.
      * Hide the game board if it is currently shown and shows the button to start new point.
      *
      * @param right Whether the next point should start with the right player or not.
+     * @param wait  Whether to wait before the execution (when a point is over and the current board should stay displayed for 5 more seconds without moving anything
      */
-    public void initNextPoint(boolean right) {
-        if (this.guiBoardShown) {
-            System.out.println("Removing");
-            this.remove(this.guiGameBoard);
-            this.guiBoardShown = false;
-            this.revalidate();
-            this.repaint();
-        }
-        this.createStartNextPointButton(right);
+    public void initNextPoint(boolean right, boolean wait) {
+        int delay = wait ? 5000 : 0;
+        // Sleep 5 seconds, then remove game board GUI and show start new Point button
+        Timer timer = new Timer(delay, l -> {
+            SwingUtilities.invokeLater(() -> {
+                        if (this.guiBoardShown) {
+                            // Remove game board from window
+                            this.remove(this.guiGameBoard);
+                            this.guiBoardShown = false;
+                            this.revalidate();
+                            this.repaint();
+                        }
+                        // Then show the start game button
+                        this.createStartNextPointButton(right);
+                    }
+            );
+        });
+
+        timer.setRepeats(false);
+        timer.start();
     }
 
     /**

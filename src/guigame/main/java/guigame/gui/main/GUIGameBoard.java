@@ -26,6 +26,7 @@ public class GUIGameBoard extends GUIPanel {
     private GUIGameBoardWindow parentWindow;
 
     private Runnable ballRunnable;
+    private Thread ballThread;
 
     /**
      * Create a {@code GUIPanel} with black background. It will automatically contain a Ball and two Paddles and have the right size.
@@ -74,7 +75,7 @@ public class GUIGameBoard extends GUIPanel {
      * @param toRemove Component to remove (potentially a button which starts this game)
      */
     public void startPoint(boolean right, Component toRemove) {
-        new Thread(() -> {
+        Thread startPointThread = new Thread(() -> {
             this.parentWindow.remove(toRemove);
             this.revalidate();
             this.repaint();
@@ -82,7 +83,8 @@ public class GUIGameBoard extends GUIPanel {
             if (this.getState() != GameState.RUNNING) {
                 this.start(right);
             }
-        }).start();
+        });
+        startPointThread.start();
     }
 
     /**
@@ -212,14 +214,13 @@ public class GUIGameBoard extends GUIPanel {
      * @param right Whether the x-speed should be positive (object goes to the right) or negative (object goes to the left).
      */
     private void startBallThread(boolean right) {
+        System.out.println("Start");
         this.ballRunnable = () -> {
-            // TODO: finish thread
             long lastLoopTime;
             final int TARGET_FPS = 30;
             final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
 
-            if (!this.ball.isInitialized())
-                this.ball.initSpeed(right);
+            this.ball.initSpeed(right);
 
             Directions pointEndingDirection = Directions.NONE;
             Directions lastRoundDirection = Directions.NONE;
@@ -261,18 +262,19 @@ public class GUIGameBoard extends GUIPanel {
                 this.checkForCollision();
                 try {
                     long waitTime = lastLoopTime - System.nanoTime() + OPTIMAL_TIME;
-                    System.out.println("Wait: " + waitTime);
+                    // Wait if some time is left
                     if (waitTime > 0)
                         Thread.sleep((waitTime) / 1000000);
                 } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
             }
 
             this.endBallThread(pointEndingDirection);
         };
 
-        // TODO: Run here?
-        this.ballRunnable.run();
+        this.ballThread = new Thread(this.ballRunnable);
+        this.ballThread.start();
     }
 
     /**
@@ -285,7 +287,7 @@ public class GUIGameBoard extends GUIPanel {
      * @throws NullPointerException if the {@code parentWindow} is not set yet
      */
     private void endBallThread(Directions offScreen) throws NullPointerException {
-        // TODO: Interrupt thread
+        this.ballThread.interrupt();
 
         // Uninitialize the ball
         this.ball.uninitialize();
@@ -295,9 +297,12 @@ public class GUIGameBoard extends GUIPanel {
         // Add a point visual as well as in the logic
         this.gameBoard.addPoint(offScreen);
 
+        // TODO: Stop paddle mouse motion listener
+
         // Direction for the next point: player who won the last point
         // If the right player won (offScreen == LEFT), the ball should go into his direction, otherwise to the left
-        this.parentWindow.initNextPoint(offScreen == Directions.LEFT);
+        // true as second param to wait 5 seconds
+        this.parentWindow.initNextPoint(offScreen == Directions.LEFT, true);
     }
 
     /**
