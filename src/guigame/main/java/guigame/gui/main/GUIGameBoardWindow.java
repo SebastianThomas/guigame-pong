@@ -76,15 +76,14 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
         this.revalidate();
         this.repaint();
 
-        this.startGameButton.addActionListener(e -> {
-            this.remove(this.startGameButton);
-            this.add(this.guiGameBoard);
-            this.guiBoardShown = true;
-            this.revalidate();
-            this.repaint();
+        this.startGameButton.addActionListener(e -> this.startGameButtonActionListener(right));
+    }
 
-            this.guiGameBoard.startPoint(right);
-        });
+    private void startGameButtonActionListener(boolean right) {
+        this.add(this.guiGameBoard);
+        this.guiBoardShown = true;
+
+        this.guiGameBoard.startPoint(right, this.startGameButton);
     }
 
     /**

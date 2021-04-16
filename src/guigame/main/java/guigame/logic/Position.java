@@ -99,6 +99,8 @@ public class Position {
     }
 
     public void resetCoordinates() {
+        System.out.println(this.coordinates);
         this.coordinates = new Coordinates(this.initialPositions[0], this.initialPositions[1]);
+        System.out.println(this.coordinates);
     }
 }

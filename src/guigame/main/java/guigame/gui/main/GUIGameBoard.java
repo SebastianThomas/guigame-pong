@@ -25,7 +25,7 @@ public class GUIGameBoard extends GUIPanel {
 
     private GUIGameBoardWindow parentWindow;
 
-    private Thread ballThread;
+    private Runnable ballRunnable;
 
     /**
      * Create a {@code GUIPanel} with black background. It will automatically contain a Ball and two Paddles and have the right size.
@@ -70,12 +70,19 @@ public class GUIGameBoard extends GUIPanel {
     /**
      * Start the game or next point.
      *
-     * @param right Whether the x-speed should be positive (the ball goes to the right) or negative (object goes to the left).
+     * @param right    Whether the x-speed should be positive (the ball goes to the right) or negative (object goes to the left).
+     * @param toRemove Component to remove (potentially a button which starts this game)
      */
-    public void startPoint(boolean right) {
-        if (this.getState() != GameState.RUNNING) {
-            this.start(right);
-        }
+    public void startPoint(boolean right, Component toRemove) {
+        new Thread(() -> {
+            this.parentWindow.remove(toRemove);
+            this.revalidate();
+            this.repaint();
+
+            if (this.getState() != GameState.RUNNING) {
+                this.start(right);
+            }
+        }).start();
     }
 
     /**
@@ -205,9 +212,8 @@ public class GUIGameBoard extends GUIPanel {
      * @param right Whether the x-speed should be positive (object goes to the right) or negative (object goes to the left).
      */
     private void startBallThread(boolean right) {
-        // TODO: finish thread
-        this.ballThread = new Thread(() -> {
-            System.out.println(Thread.currentThread());
+        this.ballRunnable = () -> {
+            // TODO: finish thread
             long lastLoopTime;
             final int TARGET_FPS = 30;
             final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
@@ -220,19 +226,27 @@ public class GUIGameBoard extends GUIPanel {
 
             // If condition becomes false, loop will break automatically, but for clarity, loop condition is not true but this expression
             while (pointEndingDirection == Directions.NONE || pointEndingDirection != lastRoundDirection) {
+                // Get time at the beginning of the loop to determine how long to sleep before doing next frame
                 lastLoopTime = System.nanoTime();
-                Rectangle size = this.ball.guiBall.getBounds();
 
+                // Calculate new Rectangle for guiBall
+                Rectangle size = this.ball.guiBall.getBounds();
                 size.x += this.ball.getPosition().getXvelocity();
                 size.y += this.ball.getPosition().getYvelocity();
-                this.ball.guiBall.setBounds(size);
+
+                // Tell the logic part which new Rectangle the ball is inside of
                 this.ball.getPosition().getCoordinates().add(this.ball.getPosition().getXvelocity(), this.ball.getPosition().getYvelocity());
 
-                this.paintImmediately(size.x - 2 * Ball.SPEED, size.y - 2 * Ball.SPEED, size.x + 2 * Ball.SPEED, size.y + 2 * Ball.SPEED);
-                // Max width of center line = 5
-                int width = 5;
-                Rectangle centerLineRepaintRect = new Rectangle((this.width - width) / 2, 0, width, this.height);
-                this.paintImmediately(centerLineRepaintRect);
+                // Do the painting and GUI-part in the EDT (Event Dispatcher Thread)
+                // With invokeLater (which works asynchronously) because there may be a paddle update at the same time too
+                SwingUtilities.invokeLater(() -> {
+                    this.ball.guiBall.setBounds(size);
+                    this.paintImmediately(size.x - 2 * Ball.SPEED, size.y - 2 * Ball.SPEED, size.x + 2 * Ball.SPEED, size.y + 2 * Ball.SPEED);
+                    // Max width of center line = 5
+                    int width = 5;
+                    Rectangle centerLineRepaintRect = new Rectangle((this.width - width) / 2, 0, width, this.height);
+                    this.paintImmediately(centerLineRepaintRect);
+                });
 
                 pointEndingDirection = this.checkForPointEnd();
 
@@ -255,9 +269,10 @@ public class GUIGameBoard extends GUIPanel {
             }
 
             this.endBallThread(pointEndingDirection);
-        });
+        };
 
-        this.ballThread.start();
+        // TODO: Run here?
+        this.ballRunnable.run();
     }
 
     /**
@@ -270,11 +285,14 @@ public class GUIGameBoard extends GUIPanel {
      * @throws NullPointerException if the {@code parentWindow} is not set yet
      */
     private void endBallThread(Directions offScreen) throws NullPointerException {
-        this.ballThread.interrupt();
+        // TODO: Interrupt thread
+
         // Uninitialize the ball
         this.ball.uninitialize();
 
+        // Reset game state
         this.gameBoard.setState(GameState.BETWEEN_POINTS);
+        // Add a point visual as well as in the logic
         this.gameBoard.addPoint(offScreen);
 
         // Direction for the next point: player who won the last point
