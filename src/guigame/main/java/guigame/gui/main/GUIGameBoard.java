@@ -3,12 +3,14 @@ package guigame.gui.main;
 import guigame.gui.objects.GUIUserPaddle;
 import guigame.gui.panes.GUIPanel;
 import guigame.logic.Constants;
+import guigame.logic.Position;
 import guigame.logic.main.Coordinates;
 import guigame.logic.main.Directions;
 import guigame.logic.main.GameBoard;
 import guigame.logic.main.GameState;
 import guigame.logic.objects.Ball;
 import guigame.logic.objects.UserPaddle;
+import guigame.logic.players.Players;
 
 import javax.swing.*;
 import java.awt.*;
@@ -168,6 +170,8 @@ public class GUIGameBoard extends GUIPanel {
 
         this.pointLabels[winningPointPlayer].setText(Integer.toString(oldScore + 1));
 
+        this.parentWindow.showPointWinningLabel(winningPointPlayer == 1);
+
         return this.getPointLabels();
     }
 
@@ -180,13 +184,14 @@ public class GUIGameBoard extends GUIPanel {
 
     private void createBall() {
         // Initialize a new Ball (which initializes a GUI-Ball too)
-        this.ball = new Ball(30);
+        this.ball = new Ball(Constants.BALL_DIMENSION_SIZE);
 
         // Set the GUI-Ball's position
         Dimension guiBallPreferredSize = this.ball.guiBall.getPreferredSize();
-        int xOffset = (width - guiBallPreferredSize.width) / 2;
-        int yOffset = (height - guiBallPreferredSize.width) / 2;
+        int xOffset = (this.width - guiBallPreferredSize.width) / 2;
+        int yOffset = (this.height - guiBallPreferredSize.width) / 2;
         this.ball.guiBall.setBounds(xOffset, yOffset, guiBallPreferredSize.width, guiBallPreferredSize.height);
+        this.ball.setInitialPositions(xOffset, yOffset);
 
         this.ball.guiBall.setForeground(Constants.fgColor);
         this.add(this.ball.guiBall);
@@ -214,39 +219,47 @@ public class GUIGameBoard extends GUIPanel {
      * @param right Whether the x-speed should be positive (object goes to the right) or negative (object goes to the left).
      */
     private void startBallThread(boolean right) {
-        System.out.println("Start");
+        this.gameBoard.resumeGame();
+
         this.ballRunnable = () -> {
             long lastLoopTime;
-            final int TARGET_FPS = 30;
+            final int TARGET_FPS = 60;
             final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
 
             this.ball.initSpeed(right);
 
-            Directions pointEndingDirection = Directions.NONE;
+            // The pointEndingDirection is being initialized with the CURRENT round's potential out-of-bounds-rule-break
+            Directions pointEndingDirection;
+            // The lastRoundDirection is being initialized with the previous round's potential out-of-bounds-rule-break
             Directions lastRoundDirection = Directions.NONE;
 
-            // If condition becomes false, loop will break automatically, but for clarity, loop condition is not true but this expression
-            while (pointEndingDirection == Directions.NONE || pointEndingDirection != lastRoundDirection) {
+            // If both pointEndingDirection and lastRoundDirection are the same AND not equal to NONE, the loop will automatically break:
+            while (true) {
                 // Get time at the beginning of the loop to determine how long to sleep before doing next frame
                 lastLoopTime = System.nanoTime();
 
                 // Calculate new Rectangle for guiBall
-                Rectangle size = this.ball.guiBall.getBounds();
-                size.x += this.ball.getPosition().getXvelocity();
-                size.y += this.ball.getPosition().getYvelocity();
+                final Rectangle size = this.ball.guiBall.getBounds();
+                float newXCoordinate = this.ball.getPosition().getCoordinates().x + this.ball.getPosition().getXvelocity();
+                float newYCoordinate = this.ball.getPosition().getCoordinates().y + this.ball.getPosition().getYvelocity();
+
+                size.x = Math.round(newXCoordinate);
+                size.y = Math.round(newYCoordinate);
 
                 // Tell the logic part which new Rectangle the ball is inside of
-                this.ball.getPosition().getCoordinates().add(this.ball.getPosition().getXvelocity(), this.ball.getPosition().getYvelocity());
+                this.ball.getPosition().setCoordinates(new Coordinates(newXCoordinate, newYCoordinate));
+
+                // Move the AI paddle(s)
+                this.moveAIPaddles();
 
                 // Do the painting and GUI-part in the EDT (Event Dispatcher Thread)
                 // With invokeLater (which works asynchronously) because there may be a paddle update at the same time too
                 SwingUtilities.invokeLater(() -> {
+                    int twiceXVelocity = 2 * ((int) Math.round(Math.ceil(this.ball.getPosition().getXvelocity())));
+
+                    // Repaint immediately Rectangle around the ball, bigger than it must be, but otherwise there may be fragments hanging around
                     this.ball.guiBall.setBounds(size);
-                    this.paintImmediately(size.x - 2 * Ball.SPEED, size.y - 2 * Ball.SPEED, size.x + 2 * Ball.SPEED, size.y + 2 * Ball.SPEED);
-                    // Max width of center line = 5
-                    int width = 5;
-                    Rectangle centerLineRepaintRect = new Rectangle((this.width - width) / 2, 0, width, this.height);
-                    this.paintImmediately(centerLineRepaintRect);
+                    this.paintImmediately(size.x - twiceXVelocity, size.y - twiceXVelocity, size.x + twiceXVelocity, size.y + twiceXVelocity);
                 });
 
                 pointEndingDirection = this.checkForPointEnd();
@@ -258,11 +271,13 @@ public class GUIGameBoard extends GUIPanel {
                 }
                 lastRoundDirection = pointEndingDirection;
 
-                // Otherwise check for not breaking collisions and wait for the next frame
-                this.checkForCollision();
+                // Check for not game-breaking collisions and wait for the next frame
+                this.checkForCollision(pointEndingDirection);
                 try {
                     long waitTime = lastLoopTime - System.nanoTime() + OPTIMAL_TIME;
-                    // Wait if some time is left
+                    // Wait if some time is left before continuing with next frame
+                    // The current thread can sleep; it takes only care of the ball.
+                    // The paddle can be moved in this time, too due to its other thread.
                     if (waitTime > 0)
                         Thread.sleep((waitTime) / 1000000);
                 } catch (InterruptedException e) {
@@ -297,8 +312,6 @@ public class GUIGameBoard extends GUIPanel {
         // Add a point visual as well as in the logic
         this.gameBoard.addPoint(offScreen);
 
-        // TODO: Stop paddle mouse motion listener
-
         // Direction for the next point: player who won the last point
         // If the right player won (offScreen == LEFT), the ball should go into his direction, otherwise to the left
         // true as second param to wait 5 seconds
@@ -306,7 +319,7 @@ public class GUIGameBoard extends GUIPanel {
     }
 
     /**
-     * Checks if the ball goes out of bounds (right or left)
+     * Checks if the ball goes out of bounds (right or left).
      */
     private Directions checkForPointEnd() {
         // Ball goes out of bounds left
@@ -315,14 +328,14 @@ public class GUIGameBoard extends GUIPanel {
         int paddleRightPaddingWidth = this.width - (5 + this.paddles[1].getWidth());
 
         // left edge of the ball is simply its x-coordinate, right edge of the ball is its x-coordinate plus its width
-        int ballLeftX = this.ball.getPosition().getCoordinates().x;
-        int ballRightX = this.ball.getPosition().getCoordinates().x + this.ball.getWidth();
+        float ballLeftX = this.ball.getPosition().getCoordinates().x;
+        float ballRightX = this.ball.getPosition().getCoordinates().x + this.ball.getWidth();
 
-        System.out.println(ballRightX);
-        System.out.println(paddleRightPaddingWidth);
-        if (ballLeftX < paddleLeftPaddingWidth)
+        // If the ball is still moving to the left and it is out of bounds (left)
+        if (ballLeftX < paddleLeftPaddingWidth && this.ball.getPosition().xMovingDirection == Directions.LEFT)
             return Directions.LEFT;
-        if (ballRightX > paddleRightPaddingWidth)
+        // If the ball is still moving to the right and it is out of bounds (right)
+        if (ballRightX > paddleRightPaddingWidth && this.ball.getPosition().xMovingDirection == Directions.RIGHT)
             return Directions.RIGHT;
 
         return Directions.NONE;
@@ -331,30 +344,175 @@ public class GUIGameBoard extends GUIPanel {
     /**
      * Check if the ball collides either with top or bottom or with one of the paddles.
      * And react to the potential collision.
+     *
+     * @param outOfBoundsX Direction from {@code checkForPointEnd}.
+     * @see GUIGameBoard#checkForPointEnd()
      */
-    private void checkForCollision() {
+    private void checkForCollision(Directions outOfBoundsX) {
+        // Get the ball position and the ball's y coordinate
+        Position ballPosition = this.ball.getPosition();
+        float ballYCoordinate = ballPosition.getCoordinates().y;
+
+        // Check for top / bottom collisions
+        if (ballPosition.getCoordinates().y < Constants.MAX_BALL_Y_SPEED - 1) {
+            ballPosition.inverseYSpeed();
+        }
+        if (ballPosition.getCoordinates().y + this.ball.getHeight() > this.height - (Constants.MAX_BALL_Y_SPEED - 1) && this.ball.getPosition().yMovingDirection == Directions.DOWN) {
+            ballPosition.inverseYSpeed();
+        }
+
+        // Check for paddle collisions
+        // Left paddle
+        if (outOfBoundsX == Directions.LEFT && this.ball.getPosition().xMovingDirection != Directions.RIGHT
+                && this.paddles[0].containsYBall(ballYCoordinate, this.ball.getHeight())) {
+            this.updatePaddleSpeeds(0);
+        }
+        // Right paddle
+        if (outOfBoundsX == Directions.RIGHT && this.ball.getPosition().xMovingDirection != Directions.LEFT
+                && this.paddles[1].containsYBall(ballYCoordinate, this.ball.getHeight())) {
+            this.updatePaddleSpeeds(1);
+        }
     }
 
     /**
-     * Update the left paddle's y-offset.
+     * Update the x- and y-speeds for
      *
-     * @param paddleLeftYOffset The new y-direction offset of the RIGHT paddle (from mouse listener or AI).
+     * @param index the (0,1) index of the paddle (right or left)
+     */
+    public void updatePaddleSpeeds(int index) {
+        // Update the y-speed
+        this.ball.setYSpeed(this.calculateYBallSpeed(index));
+
+        // Update the x-velocity and add to it.
+        this.ball.inverseXSpeed();
+        this.ball.updateXSpeedSlightly();
+    }
+
+    /**
+     * Moves the paddles automatically if they are artificial intelligence players.
+     *
+     * @see GUIGameBoard#moveLeftAIPaddle()
+     * @see GUIGameBoard#moveRightAIPaddle()
+     */
+    private void moveAIPaddles() {
+        // Move the right player
+        this.moveLeftAIPaddle();
+        // Move the left player
+        this.moveRightAIPaddle();
+    }
+
+    /**
+     * Moves the left paddle since it should be and AI player. Checks for this anyways.
+     *
+     * @see GUIGameBoard#moveAIPaddles()
+     * @see GUIGameBoard#moveRightAIPaddle()
+     * @see guigame.logic.players.Player#isAI()
+     */
+    private void moveLeftAIPaddle() {
+        // Check if the left player is an AI
+        if (!this.getPlayers().getPlayers()[0].isAI()) return;
+
+        if (this.ball.getPosition().xMovingDirection == Directions.RIGHT) {
+            // The ball is moving away from the paddle
+            this.paddles[0].moveTowardsCenter(this.height);
+        }
+        if (this.ball.getPosition().xMovingDirection == Directions.LEFT) {
+            // The ball is moving towards the paddle
+            this.paddles[0].moveTowardsBall(this.ball);
+        }
+
+        this.paddles[0].guiPaddle.moveToCoordinates();
+    }
+
+    /**
+     * Moves the right paddle if it is and AI player, returns immediately otherwise.
+     *
+     * @see GUIGameBoard#moveAIPaddles()
+     * @see GUIGameBoard#moveLeftAIPaddle()
+     * @see guigame.logic.players.Player#isAI()
+     */
+    private void moveRightAIPaddle() {
+        // Check if the left player is an AI
+        if (!this.getPlayers().getPlayers()[1].isAI()) return;
+
+        if (this.ball.getPosition().xMovingDirection == Directions.LEFT) {
+            // The ball is moving away from the paddle
+            this.paddles[1].moveTowardsCenter(this.height);
+        }
+        if (this.ball.getPosition().xMovingDirection == Directions.RIGHT) {
+            // The ball is moving towards the paddle
+            this.paddles[1].moveTowardsBall(this.ball);
+        }
+
+        this.paddles[1].guiPaddle.moveToCoordinates();
+    }
+
+    /**
+     * @param paddle Index for the paddle with which the ball collides
+     */
+    private float calculateYBallSpeed(int paddle) {
+        float ballHeight = this.ball.getHeight();
+        float ballycenter = this.ball.getPosition().getCoordinates().y + (ballHeight / 2);
+        float paddleHeight = UserPaddle.HEIGHT;
+        float paddleyCoord = this.paddles[paddle].getYCoordinate();
+        float paddleycenter = paddleyCoord + (paddleHeight / 2);
+
+        // It is inversed since the positive difference should lead to a negative ball direction
+        float ballPaddleDifference = -1 * (paddleycenter - ballycenter);
+
+        // Difference between negative max ball y-speed and positive max ball y-speed
+        return Constants.MAX_BALL_Y_SPEED * ballPaddleDifference / ((paddleHeight + ballHeight) / 2);
+    }
+
+    /**
+     * @return whether there is one human playing
+     */
+    public boolean rightIsHuman() {
+        return this.gameBoard.rightIsHuman();
+    }
+
+    /**
+     * @return The players playing against each other.
+     */
+    public Players getPlayers() {
+        return this.gameBoard.getPlayers();
+    }
+
+    /**
+     * Update the left paddle's y-offset, in the GUI as well as in the logic part.
+     *
+     * @param paddleLeftYOffset The new y-direction offset of the LEFT paddle (AI).
+     * @see GUIGameBoard#updateRightPaddle(int)
      */
     public void updateLeftPaddle(int paddleLeftYOffset) {
-        System.out.println("Update left paddle: " + paddleLeftYOffset);
+        // Get current bounds
+        Rectangle size = this.paddles[0].guiPaddle.getBounds();
+
+        // Set the GUI bounds
+        size.y = GUIUserPaddle.normalizeYOffset(paddleLeftYOffset, this.height);
+        this.paddles[0].guiPaddle.setBounds(size);
+
+        // Set the logic y-coordinate
+        this.paddles[0].getPosition().getCoordinates().y = size.y;
     }
 
     /**
-     * Update the right paddle's y-offset. This is the user's one if there is a human player.
+     * Update the right paddle's y-offset, in the GUI as well as in the logic part.
+     * This is the user's one if there is a human player.
      *
      * @param paddleRightYOffset The new y-direction offset of the RIGHT paddle (from mouse listener or AI).
+     * @see GUIGameBoard#updateLeftPaddle(int)
      */
     public void updateRightPaddle(int paddleRightYOffset) {
+        // Get current bounds
         Rectangle size = this.paddles[1].guiPaddle.getBounds();
 
+        // Set the GUI bounds
         size.y = GUIUserPaddle.normalizeYOffset(paddleRightYOffset, this.height);
-
         this.paddles[1].guiPaddle.setBounds(size);
+
+        // Set the logic y-coordinate
+        this.paddles[1].getPosition().getCoordinates().y = size.y;
     }
 
     public GameState getState() {

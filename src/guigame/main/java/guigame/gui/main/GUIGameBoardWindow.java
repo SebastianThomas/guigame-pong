@@ -2,6 +2,8 @@ package guigame.gui.main;
 
 import guigame.gui.panes.buttons.BaseButton;
 import guigame.logic.Constants;
+import guigame.logic.main.GameState;
+import guigame.logic.players.Player;
 
 import javax.swing.*;
 import java.awt.*;
@@ -14,6 +16,9 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
     private boolean guiBoardShown;
 
     private BaseButton startGameButton;
+
+    private JLabel pointWinningLabel;
+    private boolean useLabel = false;
 
     public GUIGameBoardWindow(GUIGameBoard guiGameBoard) {
         // Init basic JWindow
@@ -51,23 +56,28 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
      * @param wait  Whether to wait before the execution (when a point is over and the current board should stay displayed for 5 more seconds without moving anything
      */
     public void initNextPoint(boolean right, boolean wait) {
-        int delay = wait ? 5000 : 0;
-        // Sleep 5 seconds, then remove game board GUI and show start new Point button
-        Timer timer = new Timer(delay, l -> {
-            SwingUtilities.invokeLater(() -> {
-                        if (this.guiBoardShown) {
-                            // Remove game board from window
-                            this.remove(this.guiGameBoard);
-                            this.guiBoardShown = false;
-                            this.revalidate();
-                            this.repaint();
-                        }
-                        // Then show the start game button
-                        this.createStartNextPointButton(right);
-                    }
-            );
-        });
+        int delay = wait ? Constants.DELAY_END_OF_POINT : 0;
 
+        // If a point has already taken place and the label is not shown yet, show the nice msg
+        if (wait && !this.useLabel) {
+            this.showPointWinningLabel(right);
+        }
+
+        // Sleep 5 seconds, then remove game board GUI as well as the label and show start new Point button
+        Timer timer = new Timer(delay, l -> {
+            this.removePointWinningLabel();
+            if (this.guiBoardShown) {
+                SwingUtilities.invokeLater(() -> {
+                    // Remove game board from window
+                    this.remove(this.guiGameBoard);
+                    this.guiBoardShown = false;
+                    this.revalidate();
+                    this.repaint();
+                });
+            }
+            // Then show the start game button
+            this.createStartNextPointButton(right);
+        });
         timer.setRepeats(false);
         timer.start();
     }
@@ -97,6 +107,55 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
         this.guiBoardShown = true;
 
         this.guiGameBoard.startPoint(right, this.startGameButton);
+    }
+
+    /**
+     * Create a label displaying a nice message to the person who won the last point and show it.
+     *
+     * @param right whether the right player has won the last point or not
+     * @see GUIGameBoardWindow#removePointWinningLabel()
+     */
+    public void showPointWinningLabel(boolean right) {
+        // -------------------- Logic for the label --------------------
+        // Get players
+        Player[] players = this.guiGameBoard.getPlayers().getPlayers();
+        Player winningPlayer = players[right ? 1 : 0];
+        // Get text for label
+        String pointWinningText = winningPlayer.getPointWinningTextAgainst(players[right ? 0 : 1]);
+        // --------------------                     --------------------
+
+        // -------------------- GUI for the label --------------------
+        // Initialize label, set its foreground color as specified in Constants.fgColor and font size to 20
+        this.pointWinningLabel = new JLabel(pointWinningText, SwingConstants.CENTER);
+        this.pointWinningLabel.setFont(new Font(this.pointWinningLabel.getFont().getName(), Font.PLAIN, 20));
+        this.pointWinningLabel.setForeground(Constants.fgColor);
+
+        // Label will have an offset of 50 from the top
+        int yOffsetLabel = 50;
+        this.pointWinningLabel.setBounds(0, yOffsetLabel, this.getWidth(), 20);
+        // --------------------                   --------------------
+
+        this.useLabel = true;
+        // Show the label
+        SwingUtilities.invokeLater(() -> {
+            // TODO: Not working
+            this.add(this.pointWinningLabel);
+        });
+    }
+
+    /**
+     * Remove label from window if it is shown.
+     *
+     * @see GUIGameBoardWindow#showPointWinningLabel(boolean)
+     */
+    private void removePointWinningLabel() {
+        if (this.useLabel) {
+            SwingUtilities.invokeLater(() -> {
+                this.remove(this.pointWinningLabel);
+                System.out.println("Removed");
+            });
+            this.useLabel = false;
+        }
     }
 
     /**
@@ -131,12 +190,20 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
     /**
      * Invoked when the mouse cursor has been moved onto a component
      * but no buttons have been pushed.
+     * <p>
+     * Updates the paddle if the game is running and the right player is marked as human.
+     * </p>
      *
      * @param e the event to be processed
      */
     @Override
     public void mouseMoved(MouseEvent e) {
-        this.guiGameBoard.updateRightPaddle(e.getY());
+        // Move the right paddle if:
+        // - game is running AND
+        // - the right player is marked as human
+        if (this.guiGameBoard.getState() == GameState.RUNNING && this.guiGameBoard.rightIsHuman()) {
+            this.guiGameBoard.updateRightPaddle(e.getY());
+        }
     }
 
     /**

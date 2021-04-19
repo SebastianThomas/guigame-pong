@@ -1,6 +1,7 @@
 package guigame.logic.main;
 
 import guigame.gui.main.GameWindow;
+import guigame.logic.Constants;
 import guigame.logic.event.KeyboardPressedEventListener;
 import guigame.logic.event.StartGameEventListener;
 import guigame.logic.menu.GameOverMenu;
@@ -30,9 +31,9 @@ public class MainGame {
      * Creates a MainGame only for testing. Must not be used!
      * </p>
      */
-    public MainGame() {
-        this.height = 500;
-        this.width = 500;
+    private MainGame() {
+        this.height = Constants.GAME_BOARD_HEIGHT;
+        this.width = Constants.GAME_BOARD_WIDTH;
 
         this.createGameBoardDirectly(true);
     }
@@ -212,6 +213,13 @@ public class MainGame {
             case MAIN_MENU -> this.mainMenu.askLeaveGame(this.window);
             case GAME_OVER_MENU -> this.gameOverMenu.askLeaveGame(this.window);
         }
+    }
+
+    /**
+     * @return The players playing against each other.
+     */
+    public Players getPlayers() {
+        return this.players;
     }
 
     public void leftArrowPressed() {

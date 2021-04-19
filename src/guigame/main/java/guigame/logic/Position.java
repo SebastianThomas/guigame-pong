@@ -1,106 +1,189 @@
 package guigame.logic;
 
 import guigame.logic.main.Coordinates;
+import guigame.logic.main.Directions;
 
+/**
+ * A class implementing some logic for Positions. Does not affect the GUI!
+ */
 public class Position {
-    private Coordinates coordinates;
-
-    private int xvelocity;
-    private int yvelocity;
+    public Directions xMovingDirection;
+    public Directions yMovingDirection;
 
     private int[] initialPositions;
 
+    private float xvelocity;
+    private float yvelocity;
+
+    private Coordinates coordinates;
+
+
     /**
-     * Create a new position with the velocity = 0 and
+     * Create a new Position with the velocities = 0 and
      *
-     * @param x The horizontal
-     * @param y The vertival
+     * @param x The initial horizontal coordinate
+     * @param y The initial vertical coordinate
      */
     public Position(int x, int y) {
         this(x, y, 0, 0);
     }
 
+    /**
+     * Create a new Position with
+     *
+     * @param x         The initial horizontal coordinate
+     * @param y         The initial vertical coordinate
+     * @param xvelocity The initial horizontal velocity
+     * @param yvelocity The initial vertical velocity
+     */
     public Position(int x, int y, int xvelocity, int yvelocity) {
         this.initialPositions = new int[]{x, y};
 
         this.coordinates = new Coordinates(x, y);
         this.xvelocity = xvelocity;
         this.yvelocity = yvelocity;
+
+        this.setMovingDirections(xvelocity, yvelocity);
     }
 
+    /**
+     * Sets the initial velocities, there where the ball is reseted to.
+     */
+    public void setInitialPositions(int x, int y) {
+        this.initialPositions = new int[]{x, y};
+    }
+
+    /**
+     * @return the current Ball's coordinates
+     */
     public Coordinates getCoordinates() {
         return coordinates;
     }
 
+    /**
+     * Set the coordinates (from a completely new object).
+     *
+     * @param coordinates The new {@code Coordinates}-object
+     * @see Position#getXvelocity()
+     */
     public void setCoordinates(Coordinates coordinates) {
         this.coordinates = coordinates;
     }
 
-    public int getXvelocity() {
+    /**
+     * @return the current y-velocity.
+     * @see Position#setXvelocity(float)
+     */
+    public float getXvelocity() {
         return xvelocity;
     }
 
-    public void setXvelocity(int xvelocity) {
+    /**
+     * Set the x-velocity and x-moving-direction.
+     *
+     * @see Position#getXvelocity()
+     */
+    public void setXvelocity(float xvelocity) {
         this.xvelocity = xvelocity;
+
+        this.setXMovingDirection(this.xvelocity);
     }
 
-    public int getYvelocity() {
+    /**
+     * @return the current y-velocity.
+     * @see Position#setYvelocity(float)
+     */
+    public float getYvelocity() {
         return yvelocity;
     }
 
-    public void setYvelocity(int yvelocity) {
+    /**
+     * Set the y-velocity and y-moving-direction.
+     *
+     * @see Position#getYvelocity()
+     */
+    public void setYvelocity(float yvelocity) {
         this.yvelocity = yvelocity;
-    }
 
-    public void update() {
-        this.coordinates.x += xvelocity;
-        this.coordinates.y += yvelocity;
+        this.setYMovingDirection(this.yvelocity);
     }
 
     /**
-     * Sets the x and y speed based on the {@code xSpeed}. There is a fixed {@code SPEED} which is the maximum added speed for both speeds
+     * Sets the moving directions based on
      *
-     * @param xSpeed   Speed for the x-axis
-     * @param maxSpeed Maximum speed (for both x and y together)
-     * @see Position#createSpeedsFromY
+     * @param xvelocity The current x-velocity
+     * @param yvelocity The current y-velocity
      */
-    public void createSpeedsFromX(int xSpeed, int maxSpeed) {
-        this.xvelocity = xSpeed;
-        this.yvelocity = maxSpeed - xSpeed;
+    public void setMovingDirections(float xvelocity, float yvelocity) {
+        this.setXMovingDirection(xvelocity);
+        this.setYMovingDirection(yvelocity);
     }
 
     /**
-     * Sets the x and y speed based on the given {@code ySpeed}. There is a fixed {@code SPEED} which is the maximum added speed for both speeds
+     * Calculate the moving direction for
      *
-     * @param ySpeed   Speed for the x-axis
-     * @param maxSpeed Maximum speed (for both x and y together)
-     * @see Position#createSpeedsFromX
+     * @param xvelocity x-velocity to calculate from.
      */
-    public void createSpeedsFromY(int ySpeed, int maxSpeed) {
-        this.xvelocity = maxSpeed - ySpeed;
-        this.yvelocity = ySpeed;
+    public void setXMovingDirection(float xvelocity) {
+        if (xvelocity > 0) this.xMovingDirection = Directions.RIGHT;
+        if (xvelocity < 0) this.xMovingDirection = Directions.LEFT;
+        if (xvelocity == 0) this.xMovingDirection = Directions.NONE;
     }
 
     /**
-     * Initialize speed with y = 0. And x:
+     * Calculate the moving direction for
+     *
+     * @param yvelocity x-velocity to calculate from.
+     */
+    public void setYMovingDirection(float yvelocity) {
+        if (yvelocity > 0) this.yMovingDirection = Directions.DOWN;
+        if (yvelocity < 0) this.yMovingDirection = Directions.UP;
+        if (yvelocity == 0) this.yMovingDirection = Directions.NONE;
+    }
+
+    /**
+     * Initialize speed with y = half of the speed (+ or - random). And x: half of the speed.
      *
      * @param right Whether the x-speed should be positive (object goes to the right) or negative (object goes to the left).
+     * @param speed The speed for the ball
      */
-    public void initSpeed(boolean right, int speed) {
+    public void initSpeed(boolean right, float speed) {
         this.xvelocity = right ? speed : -speed;
-        this.yvelocity = 0;
+        this.yvelocity = Math.random() > 0.5 ? speed / 2 : -speed / 2;
+
+        this.setMovingDirections(this.xvelocity, this.yvelocity);
+    }
+
+    public void updateXSpeed(float toAdd) {
+        if (this.xvelocity < 0) {
+            this.xvelocity -= toAdd;
+            return;
+        }
+        this.xvelocity += toAdd;
     }
 
     /**
-     * Inverse the horizontal speed.
+     * Inverse the horizontal speed and set the moving direction.
      */
     public void inverseXSpeed() {
         this.xvelocity = -this.xvelocity;
+        this.setXMovingDirection(this.xvelocity);
     }
 
+    /**
+     * Inverse the horizontal speed and set the moving direction.
+     */
+    public void inverseYSpeed() {
+        this.yvelocity = -this.yvelocity;
+        this.setYMovingDirection(this.yvelocity);
+    }
+
+    /**
+     * Resets the coordinates to the initial values (from constructor).
+     * Does not reset velocities!
+     */
     public void resetCoordinates() {
-        System.out.println(this.coordinates);
         this.coordinates = new Coordinates(this.initialPositions[0], this.initialPositions[1]);
-        System.out.println(this.coordinates);
+        this.setMovingDirections(this.initialPositions[0], this.initialPositions[0]);
     }
 }

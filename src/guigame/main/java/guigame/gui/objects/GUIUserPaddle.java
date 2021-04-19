@@ -33,7 +33,7 @@ public class GUIUserPaddle extends JComponent {
 
         this.position = this.userPaddle.getPosition();
 
-        this.setLocation(this.position.getCoordinates().x, this.position.getCoordinates().y);
+        this.setLocation(Math.round(this.position.getCoordinates().x), Math.round(this.position.getCoordinates().y));
         this.setSize(this.width, this.height);
     }
 
@@ -56,6 +56,16 @@ public class GUIUserPaddle extends JComponent {
             newOffset = wholeHeight - UserPaddle.HEIGHT;
         }
         return newOffset;
+    }
+
+    /**
+     * Moves the GUI to the y-offset (from the logic in {@code UserPaddle}).
+     */
+    public void moveToCoordinates() {
+        Rectangle size = this.getBounds();
+        size.y = Math.round(this.userPaddle.getYCoordinate());
+
+        this.setBounds(size);
     }
 
     /**

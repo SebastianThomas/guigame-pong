@@ -44,6 +44,6 @@ public class MainMenu extends Menu {
      * @return Whether one human or no humans are selected
      */
     public boolean oneHuman() {
-        return this.players.getPlayers()[0].isAI() || this.players.getPlayers()[1].isAI();
+        return !this.players.getPlayers()[0].isAI() || !this.players.getPlayers()[1].isAI();
     }
 }

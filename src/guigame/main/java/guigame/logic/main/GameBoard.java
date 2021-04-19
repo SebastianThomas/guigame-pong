@@ -2,6 +2,7 @@ package guigame.logic.main;
 
 import guigame.gui.main.GUIGameBoard;
 import guigame.logic.Constants;
+import guigame.logic.players.Players;
 
 /**
  * Class to represent the Game Board in the game. Only when state == RUNNING, PAUSE or BETWEEN_POINTS
@@ -9,13 +10,17 @@ import guigame.logic.Constants;
 public class GameBoard {
     private final int width;
     private final int height;
+
     private final MainGame mainGame;
+
     private final boolean human;
+    private final int[] score;
+
     private GUIGameBoard guiBoard;
     private GameState gameState;
-    private boolean loop;
 
-    private int[] score;
+    // TODO: Implement further checkout for loop which is only assigned but not used
+    private boolean loop;
 
     /**
      * @param width    Width of the GameBoard
@@ -28,6 +33,7 @@ public class GameBoard {
         this.height = height;
 
         this.mainGame = mainGame;
+        this.gameState = GameState.BETWEEN_POINTS;
 
         this.human = human;
 
@@ -36,6 +42,9 @@ public class GameBoard {
         this.setGUIBoard();
     }
 
+    /**
+     * Create a new GUIBoard.
+     */
     private void setGUIBoard() {
         this.guiBoard = new GUIGameBoard(this);
     }
@@ -91,11 +100,29 @@ public class GameBoard {
         return this.gameState;
     }
 
+    /**
+     * Sets the new game state. Prefer the methods below over {@code setState}.
+     *
+     * @see GameBoard#pauseGame()
+     * @see GameBoard#resumeGame()
+     * @see GameBoard#resumeBetweenPoints()
+     * @see GameBoard#showPauseBetweenPoints()
+     */
     public void setState(GameState newState) {
         this.gameState = newState;
         this.mainGame.changeState(newState);
     }
 
+    /**
+     * @return Whether there is a human playing or two AIs
+     */
+    public boolean rightIsHuman() {
+        return this.human;
+    }
+
+    /**
+     * Pauses the game: Set the state to PAUSED and do not loop.
+     */
     public void pauseGame() {
         this.setState(GameState.PAUSED);
         System.out.println("State changed to:" + this.gameState);
@@ -103,6 +130,9 @@ public class GameBoard {
         this.loop = false;
     }
 
+    /**
+     * Resume the game: Set the state to RUNNING and do loop.
+     */
     public void resumeGame() {
         this.setState(GameState.RUNNING);
         System.out.println("State changed to:" + this.gameState);
@@ -110,28 +140,50 @@ public class GameBoard {
         this.loop = true;
     }
 
+    /**
+     * Pauses the game: Set the state to PAUSED_BETWEEN_POINTS and do not loop.
+     */
     public void showPauseBetweenPoints() {
         this.setState(GameState.PAUSED_BETWEEN_POINTS);
         System.out.println("State changed to:" + this.gameState);
 
-        // Loop stays false
+        this.loop = false;
     }
 
+    /**
+     * Pauses the game: Set the state to BETWEEN_POINTS and do not loop.
+     */
     public void resumeBetweenPoints() {
         this.setState(GameState.BETWEEN_POINTS);
         System.out.println("State changed to:" + this.gameState);
 
-        // Loop stays false
+        this.loop = false;
     }
 
+    /**
+     * @return the GUI-board
+     */
     public GUIGameBoard getGuiBoard() {
         return this.guiBoard;
     }
 
+    /**
+     * @return The players playing against each other.
+     */
+    public Players getPlayers() {
+        return this.mainGame.getPlayers();
+    }
+
+    /**
+     * @return the game board's height
+     */
     public int getHeight() {
         return this.height;
     }
 
+    /**
+     * @return the game board's width
+     */
     public int getWidth() {
         return this.width;
     }

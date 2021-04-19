@@ -28,7 +28,7 @@ public class GUIBall extends JComponent {
 
         this.position = ball.getPosition();
 
-        this.setLocation(this.position.getCoordinates().x, this.position.getCoordinates().y);
+        this.setLocation(Math.round(this.position.getCoordinates().x), Math.round(this.position.getCoordinates().y));
         this.setSize(this.width, this.height);
     }
 
