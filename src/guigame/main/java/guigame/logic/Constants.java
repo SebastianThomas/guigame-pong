@@ -2,7 +2,11 @@ package guigame.logic;
 
 import java.awt.*;
 
-public class Constants {
+/**
+ * Maintains important constants which are accessed throughout the code.
+ * Cannot be instantiated.
+ */
+public abstract class Constants {
     /**
      * The time to wait before showing start-next-point-button [in milliseconds].
      */
@@ -11,7 +15,7 @@ public class Constants {
     /**
      * The maximum y-speed for the ball
      */
-    public static final int MAX_BALL_Y_SPEED = 4;
+    public static final int MAX_BALL_Y_SPEED = 7;
 
     /**
      * The update value for the ball's x-speed after each paddle collision
@@ -44,17 +48,15 @@ public class Constants {
     // ---------------------        ---------------------
 
     /**
-     * End game at a max score of 10 points for one person
+     * End game at a max score of 5 points for one person
      */
-    public static final int winningScore = 10;
+    public static int WINNING_SCORE = 5;
 
-    // TODO: Set this speed from Main Menu
     /**
      * The max speed of an AI player.
      */
     public static int MAX_AI_PADDLE_SPEED = 3;
 
-    // TODO: Set this initial speed from Main Menu
     /**
      * The ball's current x-speed, initial value: 3.
      */

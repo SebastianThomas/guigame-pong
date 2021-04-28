@@ -4,13 +4,28 @@ import guigame.logic.Constants;
 
 import javax.swing.*;
 
+/**
+ * A {@code JPanel} with predefined colors and an updated {@code removeAll}-method.
+ *
+ * @see Constants#fgColor
+ * @see Constants#bgColor
+ */
 public class GUIPanel extends JPanel {
+    /**
+     * Create a new {@code GUIPanel} with the predefined colors.
+     */
     public GUIPanel() {
         super();
 
         this.initColors();
     }
 
+    /**
+     * Initializes the color scheme for the panel.
+     *
+     * @see Constants#fgColor
+     * @see Constants#bgColor
+     */
     private void initColors() {
         this.setBackground(Constants.bgColor);
         this.setForeground(Constants.fgColor);

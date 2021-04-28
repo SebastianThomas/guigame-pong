@@ -1,27 +1,47 @@
 package guigame.logic.event;
 
-import guigame.logic.main.MainGame;
-
+/**
+ * An event listener for Keyboard-events.
+ *
+ * @see KeyboardPressedEvent
+ */
 public class KeyboardPressedEventListener implements EventListener {
-    private final MainGame mainGame;
+    /**
+     * The {@code KeyboardButtonAdapter} to invoke keyboard presses on.
+     */
+    private final KeyboardButtonAdapter adapter;
 
-    public KeyboardPressedEventListener(MainGame g) {
-        this.mainGame = g;
+    /**
+     * The adapter to invoke events on.
+     *
+     * @param adapter The {@code KeyboardButtonAdapter} to invoke keyboard presses on.
+     * @see KeyboardButtonAdapter
+     */
+    public KeyboardPressedEventListener(KeyboardButtonAdapter adapter) {
+        this.adapter = adapter;
     }
 
+    /**
+     * When a {@code KeyboardPressedEvent}'s {@code action} method was triggered.
+     *
+     * @see KeyboardPressedEvent
+     * @see KeyboardPressedEvent#action()
+     */
     @Override
     public void actionPerformed(Event e) {
-        KeyboardPressedEvent event = ((KeyboardPressedEvent) e);
+        // Parse event to KeyboardPressedEvent to get the button from it.
+        KeyboardPressedEvent event = (KeyboardPressedEvent) e;
 
-        // TODO: Other keys
+        // Switch for the button's possible values
         switch (event.getButton()) {
-            case 27 -> this.mainGame.escapePressed();
-            case 37 -> this.mainGame.leftArrowPressed();
-            case 38 -> this.mainGame.topArrowPressed();
-            case 39 -> this.mainGame.rightArrowPressed();
-            case 40 -> this.mainGame.bottomArrowPressed();
+            case 27 -> this.adapter.escapePressed();
+            case 37 -> this.adapter.leftArrowPressed();
+            case 38 -> this.adapter.topArrowPressed();
+            case 39 -> this.adapter.rightArrowPressed();
+            case 40 -> this.adapter.bottomArrowPressed();
             default -> {
-                this.mainGame.otherKeyPressed(event.getButton());
+                // Button has no specified adapter-method
+                this.adapter.otherKeyPressed(event.getButton());
                 System.out.println("KEY: " + event.getButton());
             }
         }

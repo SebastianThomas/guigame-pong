@@ -8,10 +8,17 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
+/**
+ * An implementation of {@code JButton}.
+ * Has a specific fore- and background.
+ */
 public class BaseButton extends JButton implements MouseListener {
     private boolean selected;
     private Font font;
 
+    /**
+     * The background color for the button.
+     */
     private Color backgroundColor;
 
     /**

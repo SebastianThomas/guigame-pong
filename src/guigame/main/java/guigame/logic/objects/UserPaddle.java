@@ -3,6 +3,12 @@ package guigame.logic.objects;
 import guigame.gui.objects.GUIUserPaddle;
 import guigame.logic.Constants;
 
+/**
+ * Logic part to {@code GUIUserPaddle}.
+ * Holds important constants for GUI paddles.
+ *
+ * @see GUIUserPaddle
+ */
 public class UserPaddle extends GameObject {
     /**
      * All user paddle's height.

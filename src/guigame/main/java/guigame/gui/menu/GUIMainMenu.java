@@ -12,46 +12,70 @@ import guigame.logic.players.Players;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * An implementation of {@code GUIMenu} for the {@code MainMenu}:
+ * Set settings for the game and start it from this menu.
+ */
 public class GUIMainMenu extends GUIMenu {
     private final Players players;
     private final MainMenu mainMenu;
 
-    private final GridBagConstraints constraints;
-
+    /**
+     * Create a new MainMenu-GUI.
+     *
+     * @param mainMenu       the {@code MainMenu} to get settings from
+     * @param players        the {@code Players} to edit from menu
+     * @param startGameEvent the {@code StartGameEvent} to invoke when game should be started
+     */
     public GUIMainMenu(MainMenu mainMenu, Players players, StartGameEvent startGameEvent) {
+        // Set params
         this.mainMenu = mainMenu;
         this.players = players;
 
+        // Set background color
         this.setBackground(Constants.bgColor);
 
+        // Set layout and constraints
         GridBagLayout l = new GridBagLayout();
         this.constraints = new GridBagConstraints();
 
         this.setLayout(l);
 
+        // Create user interface
         this.createLabel();
         this.createButtons(startGameEvent);
         this.createSliders();
     }
 
+    /**
+     * Create the title-label ("PONG") and add it to the layout.
+     */
     private void createLabel() {
+        // Create new GUILabel
         GUILabel guiLabel = new GUILabel("PONG", 40);
-        guiLabel.setForeground(Constants.fgColor);
 
+        // Add label
         this.addComponent(guiLabel, 0, 0, 2, 10);
     }
 
     /**
-     * Create buttons for Start game and select users
+     * Create buttons for Start game and select users.
+     *
+     * @param startGameEvent the {@code StartGameEvent} to invoke when game should be started
      */
     private void createButtons(StartGameEvent startGameEvent) {
+        // Create start game button and show it
         StartGameBaseButton startButton = new StartGameBaseButton(startGameEvent);
         this.addComponent(startButton, 0, 1, 1, 10);
 
+        // Create a select user submenu and show it
         GUISelectUsersSubmenu guiSelectUsersSubmenu = new GUISelectUsersSubmenu(this.players);
         this.addComponent(guiSelectUsersSubmenu, 0, 2, 2, 10);
     }
 
+    /**
+     * Create sliders for AI-Difficulty and Ball-speed.
+     */
     private void createSliders() {
         // AI difficulty
         // Slider for the maximum AI-speed
@@ -61,7 +85,7 @@ public class GUIMainMenu extends GUIMenu {
         // Label for ball speed, with font-size = 16 and no border
         GUILabel aiDiffLabel = new GUILabel("Schwierigkeit des KI-Gegners", 16, false);
 
-        // Panel as container for label and slider (ball speed)
+        // Panel as container for label and slider (ai-difficulty)
         GridLayout aiDiffGridLayout = new GridLayout(2, 1);
         JPanel aiDiffPanel = new JPanel(aiDiffGridLayout);
         aiDiffPanel.setForeground(Constants.fgColor);
@@ -92,7 +116,17 @@ public class GUIMainMenu extends GUIMenu {
         this.addComponent(ballSpeedPanel, 0, 4, 2, 20);
     }
 
+    /**
+     * Add a component at a specific (x,y)-position.
+     *
+     * @param component component to add
+     * @param x         x-position for the new component
+     * @param y         y-position for the new component
+     * @param weightx   weightx of the component
+     * @param pady      y-padding around the component
+     */
     private void addComponent(JComponent component, int x, int y, int weightx, int pady) {
+        // Set params
         this.constraints.gridx = x;
         this.constraints.gridy = y;
 
@@ -100,9 +134,11 @@ public class GUIMainMenu extends GUIMenu {
 
         this.constraints.weightx = weightx;
 
+        // Fill horizontally and center
         this.constraints.fill = GridBagConstraints.HORIZONTAL;
         this.constraints.anchor = GridBagConstraints.CENTER;
 
+        // Add component
         this.add(component, this.constraints);
     }
 }

@@ -7,22 +7,30 @@ import javax.swing.plaf.basic.BasicSliderUI;
 import java.awt.*;
 import java.util.Hashtable;
 
+/**
+ * Implementation of {@code JSlider} with the game's default colors and a ball as slider-thumb (knob).
+ */
 public class GUISlider extends JSlider {
     /**
      * Creates a {@code GUISlider} in {@code HORIZONTAL} orientation.
      * It will have a {@code GUISliderUI} as UI.
      *
      * @see GUISliderUI
+     * @see GUISlider#HORIZONTAL
      */
     public GUISlider(int min, int max, int value, int majorTickSpacing, String... labels) {
+        // Init a slider
         super(SwingConstants.HORIZONTAL, min, max, value);
 
+        // Set custom UI
         this.setUI(new GUISliderUI(this));
 
+        // Set ticks
         this.setMajorTickSpacing(majorTickSpacing);
         this.setPaintTicks(true);
         this.setSnapToTicks(false);
 
+        // Set labels and paint them
         Hashtable<Integer, JLabel> sliderTable = this.createSliderLabelTable(labels);
         this.setLabelTable(sliderTable);
         this.setPaintLabels(true);
@@ -35,27 +43,38 @@ public class GUISlider extends JSlider {
      * @return Hashtable with all tick-labels
      */
     private Hashtable<Integer, JLabel> createSliderLabelTable(String... labels) {
+        // Create new Table for labels
         Hashtable<Integer, JLabel> labelTable = new Hashtable<>();
 
+        // Fill Hashtable
         for (int i = 0; i < labels.length; i++) {
+            // Init label
             JLabel label = new JLabel(labels[i]);
 
+            // Set colors
             label.setForeground(Constants.fgColor);
             label.setBackground(Constants.bgColor);
 
+            // Put label into Hashtable
             labelTable.put(i + 1, label);
         }
 
+        // Return filled Hashtable
         return labelTable;
     }
 }
 
 /**
- * This class takes care of the style of a {@code GUISlider}.
+ * Implementation of {@code BasicSliderUI}: style of a {@code GUISlider}.
  */
 class GUISliderUI extends BasicSliderUI {
     private final Color thumbColor;
     private final Color trackColor;
+
+    /**
+     * The arc for the track.
+     */
+    private final int trackArc = 8;
 
     /**
      * Constructs a {@code GUISliderUI} for {@code JSlider} in {@code HORIZONTAL} orientation.
@@ -63,24 +82,32 @@ class GUISliderUI extends BasicSliderUI {
      * @param slider The slider to affect
      */
     public GUISliderUI(JSlider slider) {
+        // Init slider UI
         super(slider);
         this.slider = slider;
 
-        this.thumbColor = Constants.sliderMarkedColor;
+        // Set colors
+        this.thumbColor = Constants.fgColor;
         this.trackColor = Constants.sliderMarkedColor;
 
         this.slider.setForeground(Constants.fgColor);
         this.slider.setBackground(Constants.bgColor);
     }
 
+    /**
+     * Paint the UI.
+     */
     @Override
     public void paint(Graphics g, JComponent c) {
+        // Repaint and recalculate insets
         super.paint(g, c);
         this.recalculateIfInsetsChanged();
         this.recalculateIfOrientationChanged();
         Rectangle clip = g.getClipBounds();
 
+        // Paint
         if (clip.intersects(this.trackRect)) {
+            // Paint custom track
             this.paintTrack(g);
         }
         if (clip.intersects(this.tickRect)) {
@@ -107,12 +134,30 @@ class GUISliderUI extends BasicSliderUI {
      */
     @Override
     public void paintTrack(Graphics g) {
-//        System.out.println(this.trackRect.x);
-//        System.out.println(this.thumbRect.x);
+        int emptyTrackWidth = (this.trackRect.width + this.trackRect.x) - this.thumbRect.x;
+        int filledTrackWidth = this.trackRect.width - emptyTrackWidth;
+
+        // Set color
         g.setColor(this.trackColor);
+        // Fill track: filled (left of the thumb) and unfilled (right of the thumb)
         g.fillRoundRect(this.trackRect.x, this.trackRect.y + this.trackRect.height / 2,
-                this.trackRect.width - this.thumbRect.x, this.trackRect.height / 2, 8, 8);
-        g.drawRoundRect(this.trackRect.x + this.thumbRect.x, this.trackRect.y + this.trackRect.height / 2,
-                Math.abs(this.thumbRect.x - this.trackRect.width), this.trackRect.height / 2, 8, 8);
+                filledTrackWidth, this.trackRect.height / 2, this.trackArc, this.trackArc);
+        g.drawRoundRect(this.thumbRect.x, this.trackRect.y + this.trackRect.height / 2,
+                emptyTrackWidth, this.trackRect.height / 2, this.trackArc, this.trackArc);
+    }
+
+    /**
+     * Paints the thumb (ball).
+     */
+    @Override
+    public void paintThumb(Graphics g) {
+        // Calculate width and height
+        int thumbWidth = this.trackArc * 2;
+        int thumbHeight = this.trackArc * 2;
+
+        // Set the right color
+        g.setColor(this.thumbColor);
+        // Paint the thumb
+        g.fillOval(this.thumbRect.x - thumbWidth / 2, this.thumbRect.y + (thumbHeight / 2 - 1), thumbWidth, thumbHeight);
     }
 }

@@ -53,20 +53,17 @@ public class GameBoard {
      * One point is over. Adds a point to one of the player and calculates whether one player has won the match.
      *
      * @param directionLoser The direction into which the ball went off the field
+     * @return Whether the game is over now
      * @throws IllegalArgumentException if the {@code directionLoser} is neither LEFT nor RIGHT
      */
-    public void addPoint(Directions directionLoser) throws IllegalArgumentException {
+    public boolean addPoint(Directions directionLoser) throws IllegalArgumentException {
         if (directionLoser == Directions.LEFT) {
             // The left player has lost a point
-            this.playerWonPoint(true);
-            // Nothing more to do
-            return;
+            return this.playerWonPoint(true);
         }
         if (directionLoser == Directions.RIGHT) {
             // The right player has lost a point
-            this.playerWonPoint(false);
-            // Nothing more to do
-            return;
+            return this.playerWonPoint(false);
         }
 
         // Specified Player does not match with any known player
@@ -77,20 +74,23 @@ public class GameBoard {
      * Do calculations for the winning player.
      *
      * @param right Whether the right player has won the point or not
+     * @return Whether the game is over now
      */
-    private void playerWonPoint(boolean right) {
+    private boolean playerWonPoint(boolean right) {
         // Index = right player won? Then add one point to the right player's score. Otherwise add one point to the left player's point
         int index = right ? 1 : 0;
         this.score[index] += 1;
 
         this.guiBoard.updatePointLabels(index);
 
-        if (this.score[index] >= Constants.winningScore) {
+        if (this.score[index] >= Constants.WINNING_SCORE) {
             this.setState(GameState.GAME_OVER_MENU);
             // TODO: Show game over menu
-//            this.showGameOverMenu();
+//            TODO: remove this.showGameOverMenu();
             System.out.println("Show game over menu");
+            return true;
         }
+        return false;
     }
 
     /**

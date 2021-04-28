@@ -8,6 +8,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.io.Serial;
 
+/**
+ * Implementation of {@code JComponent}: For user paddles.
+ * There will be two paddles: right and left.
+ *
+ * @see UserPaddle
+ */
 public class GUIUserPaddle extends JComponent {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -24,15 +30,19 @@ public class GUIUserPaddle extends JComponent {
      * @param userPaddle The {@code UserPaddle} the GUI-element belongs to.
      */
     public GUIUserPaddle(UserPaddle userPaddle) {
+        // Init Component
         super();
 
+        // Set logic-paddle
         this.userPaddle = userPaddle;
 
+        // Set width, height and position
         this.height = this.userPaddle.getHeight();
         this.width = this.userPaddle.getWidth();
 
         this.position = this.userPaddle.getPosition();
 
+        // Set GUI-location and -size
         this.setLocation(Math.round(this.position.getCoordinates().x), Math.round(this.position.getCoordinates().y));
         this.setSize(this.width, this.height);
     }
@@ -48,13 +58,17 @@ public class GUIUserPaddle extends JComponent {
      * @return The normalized offset.
      */
     public static int normalizeYOffset(int paddleLeftYOffset, int wholeHeight) {
+        // Calculate new offset
         int newOffset = paddleLeftYOffset - UserPaddle.HEIGHT / 2;
+        // If it should be higher than 0, set it to 0
         if (newOffset < 0) {
             newOffset = 0;
         }
+        // If it is out of the window, set it to the highest possible point
         if (newOffset + UserPaddle.HEIGHT > wholeHeight) {
             newOffset = wholeHeight - UserPaddle.HEIGHT;
         }
+        // Return the normalized offset
         return newOffset;
     }
 
@@ -62,9 +76,12 @@ public class GUIUserPaddle extends JComponent {
      * Moves the GUI to the y-offset (from the logic in {@code UserPaddle}).
      */
     public void moveToCoordinates() {
+        // Get current bounds
         Rectangle size = this.getBounds();
+        // Set new y-offset
         size.y = Math.round(this.userPaddle.getYCoordinate());
 
+        // Set new bounds
         this.setBounds(size);
     }
 

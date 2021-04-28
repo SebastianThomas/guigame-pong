@@ -4,9 +4,16 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 
+/**
+ * Utility class to generate borders.
+ *
+ * @see Border
+ */
 public abstract class Borders {
     /**
      * Creates a basic dashed border.
+     *
+     * @return A new dashed border
      */
     public static Border createDashedBorder() {
         return BorderFactory.createStrokeBorder(
@@ -19,7 +26,11 @@ public abstract class Borders {
     }
 
     /**
-     * Creates a basic empty border.
+     * Creates a basic empty border with
+     * a top and bottom of 10 and
+     * a left and right of 20.
+     *
+     * @return A new empty border
      */
     public static Border createEmptyBorder() {
         return BorderFactory.createEmptyBorder(10, 20, 10, 20);

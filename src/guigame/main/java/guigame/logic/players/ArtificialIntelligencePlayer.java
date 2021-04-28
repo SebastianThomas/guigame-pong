@@ -1,39 +1,31 @@
 package guigame.logic.players;
 
+/**
+ * An AI-player. Overrides {@code isAI} to return true.
+ *
+ * @see ArtificialIntelligencePlayer#isAI()
+ */
 public class ArtificialIntelligencePlayer extends Player {
+    /**
+     * Creates a new AI-player.
+     *
+     * @param index the index of the AI-player
+     * @param y     The initial y-offset
+     * @see #ArtificialIntelligencePlayer(String, int)
+     */
     public ArtificialIntelligencePlayer(int index, int y) {
         super(String.format("KI %d", index + 1), y);
     }
 
+    /**
+     * Creates a new AI-player.
+     *
+     * @param name The initial name of the AI-player
+     * @param y    The initial y-offset
+     * @see #ArtificialIntelligencePlayer(int, int)
+     */
     public ArtificialIntelligencePlayer(String name, int y) {
         super(name, y);
-    }
-
-    // TODO: Implement go step by step
-    private static int stepByStep(int step, int before) {
-        return step + before;
-    }
-
-    public void goToHeight(int y, int speed) {
-        if (this.y < y) {
-            this.goToHeightUp(y, speed);
-            return;
-        }
-        if (this.y > y) {
-            this.goToHeightDown(y, speed);
-        }
-    }
-
-    private void goToHeightDown(int y, int speed) {
-        while (this.y > y) {
-            y = stepByStep(y, -speed);
-        }
-    }
-
-    private void goToHeightUp(int y, int speed) {
-        while (this.y < y) {
-            y = stepByStep(y, speed);
-        }
     }
 
     @Override

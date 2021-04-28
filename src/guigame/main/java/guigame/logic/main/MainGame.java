@@ -1,16 +1,19 @@
 package guigame.logic.main;
 
 import guigame.gui.main.GameWindow;
-import guigame.logic.Constants;
+import guigame.logic.event.KeyboardButtonAdapter;
 import guigame.logic.event.KeyboardPressedEventListener;
 import guigame.logic.event.StartGameEventListener;
-import guigame.logic.menu.GameOverMenu;
 import guigame.logic.menu.MainMenu;
 import guigame.logic.players.Players;
 
 import javax.swing.*;
 
-public class MainGame {
+/**
+ * Logic part to {@code GUIMainGame}.
+ * Shows the {@code GameWindow} and from here, the game is started (with GUI).
+ */
+public class MainGame implements KeyboardButtonAdapter {
     private final int height;
     private final int width;
     private StartGameEventListener startGameEventListener;
@@ -19,40 +22,45 @@ public class MainGame {
     private GameWindow window;
     private GameBoard gameBoard;
     private MainMenu mainMenu;
-    private GameOverMenu gameOverMenu;
 
     private KeyboardPressedEventListener keyboardPressedEventListener;
 
     private GameState state;
 
     /**
-     * FOR TESTING ONLY!
-     * <p>
-     * Creates a MainGame only for testing. Must not be used!
-     * </p>
+     * Creates a new {@code MainGame}. It starts the main menu, from where a game ({@code GameBoard}) can be started.
+     *
+     * @param height Height of the window
+     * @param width  Width of the window
      */
-    private MainGame() {
-        this.height = Constants.GAME_BOARD_HEIGHT;
-        this.width = Constants.GAME_BOARD_WIDTH;
-
-        this.createGameBoardDirectly(true);
-    }
-
     public MainGame(int height, int width) {
         this.height = height;
         this.width = width;
 
+        System.out.println("MainGame created");
+
         this.create();
     }
 
+    /**
+     * Sets a JFrame to visible.
+     *
+     * @param window The {@code JFrame}
+     * @param b      Whether the JFrame should be set to visible or invisible
+     */
     private static void showGameWindow(JFrame window, boolean b) {
         window.setVisible(b);
     }
 
+    /**
+     * Initializes the {@code MainGame}.
+     * Create the listeners.
+     * Create the {@code GUIGameWindow}.
+     * Show the main menu.
+     */
     private void create() {
         // Create Main Menu
         this.createMainMenu();
-        this.createGameOverMenu();
 
         // Set event listeners
         this.createKeyboardEventListener();
@@ -65,31 +73,15 @@ public class MainGame {
     }
 
     /**
-     * For testing purposes; doesn't create main menu but directly starts the game.
-     *
-     * @param human Whether one player should be a human or both players are AIs
+     * Creates an {@code MainMenu}.
+     * Initializes the {@code players}.
      */
-    private void createGameBoardDirectly(boolean human) {
-        this.createGameOverMenu();
-
-        this.createKeyboardEventListener();
-
-        this.createGameWindow();
-
-        this.createGameBoard(human);
-        this.showGameBoard();
-    }
-
     private void createMainMenu() {
         if (this.startGameEventListener == null)
             this.createStartGameEventListener();
 
         this.mainMenu = new MainMenu(this.height / 2, this.startGameEventListener);
         this.players = mainMenu.getPlayers();
-    }
-
-    private void createGameOverMenu() {
-        this.gameOverMenu = new GameOverMenu(this.window);
     }
 
     /**
@@ -101,106 +93,101 @@ public class MainGame {
         this.gameBoard = new GameBoard(this.width, this.height, this, human);
     }
 
+    /**
+     * Create a {@code GameWindow}, then show it.
+     *
+     * @see GameWindow
+     */
     private void createGameWindow() {
         this.window = new GameWindow(this.width, this.height, this.keyboardPressedEventListener);
         showGameWindow(this.window, true);
     }
 
+    /**
+     * Create a {@code StartGameEventListener}.
+     *
+     * @see StartGameEventListener
+     */
     private void createStartGameEventListener() {
         this.startGameEventListener = new StartGameEventListener(this);
     }
 
+    /**
+     * Create a {@code KeyboardPressedEventListener}.
+     *
+     * @see KeyboardPressedEventListener
+     */
     private void createKeyboardEventListener() {
         this.keyboardPressedEventListener = new KeyboardPressedEventListener(this);
     }
 
     /**
      * Prints play to the console.
-     * Create game board with settings from Main Menu, then destroy main menu and show the game board (starts game)
+     * Create game board with settings from Main Menu, then show the {@code GameBoard} (starts game) destroy the parent window since it is not used anymore.
+     *
+     * @see GameBoard
      */
     public void startGame() {
-        System.out.println("Play!!!");
-
+        // Create a new GameBoard
         this.createGameBoard(this.mainMenu.oneHuman());
-        this.destroyMainMenu();
 
+        // Show this GameBoard. Will automatically destroy the parent window since it is not used anymore.
         this.showGameBoard();
     }
 
     /**
-     * Destroy GameBoard and init / show GameOverMenu.
+     * Changes the current MainGame's {@code GameState}.
      *
-     * @param winner Index of winner (0 or 1).
+     * @see GameState
      */
-    public void endGame(int winner) {
-        System.out.println("Game Over");
-
-        // Destroy Game Board and init GameOverMenu
-        this.destroyGameBoard();
-
-        this.createGameOverMenu();
-        this.showGameOverMenu(winner);
-    }
-
     public void changeState(GameState newState) {
         this.state = newState;
     }
 
     /**
-     * Add the (PREVIOUSLY SET) main menu to window and set game state to MAIN_MENU
+     * Add the (PREVIOUSLY SET) main menu to window and set game state to MAIN_MENU.
      */
     private void showMainMenu() {
+        this.changeState(GameState.MAIN_MENU);
         this.window.setMainMenu(this.mainMenu);
-        this.state = GameState.MAIN_MENU;
     }
 
     /**
-     * Destroys the main menu and it's GUI
+     * Hides the parent window.
+     * Shows a {@code GUIGameBoardWindow} and initializes playing.
+     * Disposes (destroys) the parent window.
      */
-    private void destroyMainMenu() {
-        this.window.removeAll();
-
-        this.mainMenu.getGuiMenu().removeAll();
-
-        this.mainMenu = null;
-
-        this.window.revalidate();
-        this.window.repaint();
-    }
-
-    /**
-     * Set the GameState to MAIN_MENU, and add the GameOverMenu to own GameWindow.
-     * Set the params for GameOverMenu.
-     *
-     * @param winner Index of winner (0 or 1) that'll be shown.
-     */
-    private void showGameOverMenu(int winner) {
-        this.window.setGameOverMenu(this.gameOverMenu);
-        this.gameOverMenu.setParams(this.startGameEventListener, this.players, winner);
-        this.state = GameState.MAIN_MENU;
-    }
-
-    /**
-     * Destroys the game over menu and it's GUI
-     */
-    private void destroyGameOverMenu() {
-        this.window.removeAll();
-
-        this.gameOverMenu = null;
-    }
-
     private void showGameBoard() {
-        this.window.removeAll();
+        // Hide the window
+        this.window.setVisible(false);
 
+        // Create a separate window for the GameBoard
         this.window.setGameBoard(this.gameBoard);
+
+        // Destroy the previous window
+        this.window.dispose();
+        System.out.println(this.window);
+
+        // Change GameState TODO: Nötig?
         this.state = GameState.BETWEEN_POINTS;
     }
 
-    private void destroyGameBoard() {
-        this.window.removeAll();
-        this.gameBoard = null;
+    /**
+     * @return The players playing against each other.
+     */
+    public Players getPlayers() {
+        return this.players;
     }
 
+    /**
+     * Should be invoked when escape button is pressed.
+     * <p>
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when escape is pressed.
+     * </p>
+     * TODO: Not working?!
+     */
+    @Override
     public void escapePressed() {
         System.out.println(this.state);
 
@@ -211,35 +198,64 @@ public class MainGame {
             case PAUSED_BETWEEN_POINTS -> this.gameBoard.resumeBetweenPoints();
 
             case MAIN_MENU -> this.mainMenu.askLeaveGame(this.window);
-            case GAME_OVER_MENU -> this.gameOverMenu.askLeaveGame(this.window);
+            case GAME_OVER_MENU -> System.out.println("Shouldn't be here...");
         }
     }
 
     /**
-     * @return The players playing against each other.
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when the arrow to the left is pressed.
      */
-    public Players getPlayers() {
-        return this.players;
-    }
-
+    @Override
     public void leftArrowPressed() {
         System.out.println("LEFT ARROW");
     }
 
-    public void rightArrowPressed() {
-        System.out.println("RIGHT ARROW");
-    }
-
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when the arrow to the top is pressed.
+     */
+    @Override
     public void topArrowPressed() {
         System.out.println("TOP ARROW");
     }
 
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when the arrow to the right is pressed.
+     */
+    @Override
+    public void rightArrowPressed() {
+        System.out.println("RIGHT ARROW");
+    }
+
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when the arrow to the bottom is pressed.
+     */
+    @Override
     public void bottomArrowPressed() {
         System.out.println("BOTTOM ARROW");
     }
 
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when any other key is pressed.
+     *
+     * @param keyCode The key which is pressed
+     * @see KeyboardButtonAdapter#escapePressed()
+     * @see KeyboardButtonAdapter#leftArrowPressed()
+     * @see KeyboardButtonAdapter#topArrowPressed()
+     * @see KeyboardButtonAdapter#rightArrowPressed()
+     * @see KeyboardButtonAdapter#bottomArrowPressed()
+     */
+    @Override
     public void otherKeyPressed(int keyCode) {
-        // TODO: Key not to react to?
         System.out.println("Key pressed, do not react: " + keyCode);
     }
 }

@@ -4,6 +4,14 @@ import guigame.gui.objects.GUIBall;
 import guigame.logic.Constants;
 import guigame.logic.Position;
 
+/**
+ * A {@code Ball} has a fixed {@code width} and {@code height}.
+ * Furthermore, it has a {@code Position}.
+ * A {@code GUIBall} belongs to it, which is shown on the {@code GUIGameBoard}.
+ *
+ * @see Position
+ * @see GUIBall
+ */
 public class Ball {
     private final int height;
     private final int width;
@@ -34,14 +42,15 @@ public class Ball {
     }
 
     /**
-     * Sets the initial velocities, there where the ball is reseted to.
+     * Sets the initial position of the ball.
      */
     public void setInitialPositions(int x, int y) {
         this.position.setInitialPositions(x, y);
     }
 
     /**
-     * Uninitialize the ball, set the velocities back to 0.
+     * Uninitialize the ball:
+     * set the velocities and the coordinates back to 0.
      */
     public void uninitialize() {
         this.position.setXvelocity(0);
@@ -81,7 +90,9 @@ public class Ball {
     }
 
     /**
+     * Slightly updates the x-speed of the ball.
      *
+     * @see Constants#BALL_X_SPEED_UPDATE
      */
     public void updateXSpeedSlightly() {
         this.position.updateXSpeed(Constants.BALL_X_SPEED_UPDATE);

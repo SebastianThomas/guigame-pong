@@ -8,6 +8,9 @@ import guigame.logic.event.EventListener;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Implementation of {@code GUIDialog}: Option pane to ask the user a question.
+ */
 public class GUIOptionPane extends GUIDialog {
     private final GridBagLayout layout;
     private final GridBagConstraints constraints;
@@ -39,7 +42,7 @@ public class GUIOptionPane extends GUIDialog {
 
         this.constraints.fill = GridBagConstraints.HORIZONTAL;
 
-        GUILabel questionLabel = new GUILabel(question, 32);
+        GUILabel questionLabel = new GUILabel(question, 32, false);
         this.addComponent(questionLabel, 0, 0, buttons.length, 2);
 
         // Add button for every button in buttons
@@ -50,36 +53,54 @@ public class GUIOptionPane extends GUIDialog {
         // Finally, pack Frame and set its visibility to visible
         this.pack();
 
-        System.out.println("GUIOptionPane created");
-
         showOptionPane(this);
     }
 
     /**
      * Runs the OptionPane in current thread.
      * <p>
-     * Best: swing-Thread (Thread-secure) if
+     * Best: swing-Thread (Thread-secure {@code paint})!
      * </p>
      */
     private static void showOptionPane(GUIOptionPane p) {
-        System.out.println(Thread.currentThread().getName());
-//        if (Thread.currentThread().getName())
         p.setVisible(true);
     }
 
+    /**
+     * Add a new button.
+     *
+     * @param buttonLabel    label (msg, text) one the button
+     * @param buttonListener listener to add to the new button
+     * @param x              The x-position ({@code GridBagConstraints constraints}) on {@code layout}
+     * @param y              The y-position ({@code GridBagConstraints constraints}) on {@code layout}
+     * @see GUIOptionPane#layout
+     * @see GUIOptionPane#constraints
+     */
     private void addButton(String buttonLabel, EventListener buttonListener, int x, int y) {
         BaseButton baseButton = new BaseButton(buttonLabel);
         baseButton.addActionListener(l -> buttonListener.actionPerformed(new ButtonEvent(buttonLabel)));
         this.addComponent(baseButton, x, y, 1, 1);
     }
 
+    /**
+     * Add a component at a specific (x,y)-position.
+     *
+     * @param c      component to add
+     * @param x      x-position for the new component
+     * @param y      y-position for the new component
+     * @param width  width of the component
+     * @param height height of the component
+     */
     private void addComponent(JComponent c, int x, int y, int width, int height) {
+        // Set x and y position
         this.constraints.gridx = x;
         this.constraints.gridy = y;
 
+        // Set width and height
         this.constraints.gridwidth = width;
         this.constraints.gridheight = height;
 
+        // Add component with specified constraints
         this.add(c, this.constraints);
     }
 }

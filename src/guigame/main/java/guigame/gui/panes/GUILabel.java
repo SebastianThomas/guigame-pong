@@ -5,6 +5,13 @@ import guigame.logic.Constants;
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * A Label which has a fore- and background from {@code Constants}.
+ * It is possible to specify font size as well as a border.
+ *
+ * @see Constants#fgColor
+ * @see Constants#bgColor
+ */
 public class GUILabel extends JLabel {
     /**
      * The font size of the current label.

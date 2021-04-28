@@ -4,34 +4,82 @@ import guigame.gui.objects.GUIUserPaddle;
 import guigame.gui.panes.GUIPanel;
 import guigame.logic.Constants;
 import guigame.logic.Position;
+import guigame.logic.event.KeyboardButtonAdapter;
+import guigame.logic.event.KeyboardPressedEvent;
+import guigame.logic.event.KeyboardPressedEventListener;
+import guigame.logic.event.StartGameEventListener;
 import guigame.logic.main.Coordinates;
 import guigame.logic.main.Directions;
 import guigame.logic.main.GameBoard;
 import guigame.logic.main.GameState;
+import guigame.logic.menu.GameOverMenu;
 import guigame.logic.objects.Ball;
 import guigame.logic.objects.UserPaddle;
 import guigame.logic.players.Players;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-public class GUIGameBoard extends GUIPanel {
+/**
+ * A {@code GUIPanel} containing the whole {@code GameBoard}. It should be shown on a {@code GUIGameBoardWindow}.
+ * It creates the separate {@code Thread} which runs the {@code Ball}-{@code Position}-update-loop it.
+ *
+ * @see GameBoard
+ * @see GUIGameBoardWindow
+ */
+public class GUIGameBoard extends GUIPanel implements KeyListener, KeyboardButtonAdapter {
+    private final KeyboardPressedEventListener keyboardPressedEventListener;
+
     private final GameBoard gameBoard;
 
+    /**
+     * Width and height for the {@code GameBoard}.
+     */
     private final int width;
     private final int height;
 
+    /**
+     * Labels to display the current score
+     */
     private final JLabel[] pointLabels;
+
+    /**
+     * Whether the game loop should be invoked or not.
+     */
+    public boolean loop;
+
+    /**
+     * The game ball
+     */
     private Ball ball;
+    /**
+     * The {@code UserPaddle}s (right and left).
+     */
     private UserPaddle[] paddles;
 
+    /**
+     * The parent window
+     */
     private GUIGameBoardWindow parentWindow;
 
+    /**
+     * Runnable the Thread should run, contains the game loop.
+     *
+     * @see GUIGameBoard#ballThread
+     */
     private Runnable ballRunnable;
+    /**
+     * Thread invoking
+     *
+     * @see GUIGameBoard#ballRunnable
+     */
     private Thread ballThread;
 
     /**
-     * Create a {@code GUIPanel} with black background. It will automatically contain a Ball and two Paddles and have the right size.
+     * Create a {@code GUIPanel} with black background.
+     * It will automatically contain a Ball and two Paddles and have the right size.
      * <p>
      * Call {@code setParentWindow} immediately after this constructor
      * or at least before starting the game to avoid {@code NullPointerException} in {@code endBallThread}!
@@ -40,20 +88,27 @@ public class GUIGameBoard extends GUIPanel {
      * @param gameBoard Game Board to show and to play on
      * @see GUIGameBoard#setParentWindow
      * @see NullPointerException
-     * @see GUIGameBoard#endBallThread
+     * @see GUIGameBoard#pointOverEndBallThread
      */
     public GUIGameBoard(GameBoard gameBoard) {
         super();
 
+        // Initialize variables
         this.gameBoard = gameBoard;
         this.width = gameBoard.getWidth();
         this.height = gameBoard.getHeight();
 
+        this.keyboardPressedEventListener = new KeyboardPressedEventListener(this);
+
+        // Remove layout
         this.setLayout(null);
 
+        // Set size and location
         this.setBounds(0, 0, this.width, this.height);
 
+        // Create point labels
         this.pointLabels = new JLabel[2];
+        // Create objects
         this.createBoardObjects();
     }
 
@@ -64,9 +119,19 @@ public class GUIGameBoard extends GUIPanel {
         this.parentWindow = parentWindow;
     }
 
+    /**
+     * Paints the whole game board.
+     * Invokes super.paintComponent, which paints all previously added.
+     * Then paints the line in the center.
+     *
+     * @param g The graphics
+     * @see GUIGameBoard#add(Component)
+     */
     @Override
     protected void paintComponent(Graphics g) {
+        // Paint content
         super.paintComponent(g);
+        // Paint line in the center
         this.createMidLine(g, 2);
     }
 
@@ -77,6 +142,7 @@ public class GUIGameBoard extends GUIPanel {
      * @param toRemove Component to remove (potentially a button which starts this game)
      */
     public void startPoint(boolean right, Component toRemove) {
+        // Create thread
         Thread startPointThread = new Thread(() -> {
             this.parentWindow.remove(toRemove);
             this.revalidate();
@@ -86,11 +152,12 @@ public class GUIGameBoard extends GUIPanel {
                 this.start(right);
             }
         });
+        // Run thread
         startPointThread.start();
     }
 
     /**
-     * Start the ball thread
+     * Start the ball thread.
      *
      * @param right Whether the x-speed should be positive (the ball goes to the right) or negative (object goes to the left).
      */
@@ -135,6 +202,8 @@ public class GUIGameBoard extends GUIPanel {
         int labelWidth = 50;
         int labelHeight = 20;
 
+        // Set both labels with the right size, padding, font etc.
+        // TODO: Set as GUILabels instead of JLabels and remove set color and font
         for (int i = 0; i < this.pointLabels.length; i++) {
             JLabel label = this.pointLabels[i];
             label.setForeground(Constants.fgColor);
@@ -147,6 +216,7 @@ public class GUIGameBoard extends GUIPanel {
             label.setBounds(x, yOffset, labelWidth, labelHeight);
         }
 
+        // Add labels
         this.add(this.pointLabels[0]);
         this.add(this.pointLabels[1]);
     }
@@ -160,14 +230,18 @@ public class GUIGameBoard extends GUIPanel {
      */
     public int[] updatePointLabels(int winningPointPlayer) throws IllegalArgumentException {
         if (this.pointLabels[0] == null || this.pointLabels[1] == null) {
+            // If the labels do not exit, create them and return [0,0]
             this.createPointLabels();
             return this.getPointLabels();
         }
+        // Catch wrong argument
         if (this.pointLabels[winningPointPlayer] == null)
             throw new IllegalArgumentException("Player index " + winningPointPlayer + " does not exist!");
 
+        // Get old score
         int oldScore = Integer.parseInt(this.pointLabels[winningPointPlayer].getText());
 
+        // Update the winning player's label's text
         this.pointLabels[winningPointPlayer].setText(Integer.toString(oldScore + 1));
 
         this.parentWindow.showPointWinningLabel(winningPointPlayer == 1);
@@ -175,6 +249,9 @@ public class GUIGameBoard extends GUIPanel {
         return this.getPointLabels();
     }
 
+    /**
+     * @return the point labels' texts (so the points)
+     */
     private int[] getPointLabels() {
         return new int[]{
                 Integer.parseInt(this.pointLabels[0].getText()),
@@ -182,6 +259,12 @@ public class GUIGameBoard extends GUIPanel {
         };
     }
 
+    /**
+     * Creates the ball with a fixed size.
+     * Spawns the {@code GUIBall} in the middle of the screen.
+     *
+     * @see Constants#BALL_DIMENSION_SIZE
+     */
     private void createBall() {
         // Initialize a new Ball (which initializes a GUI-Ball too)
         this.ball = new Ball(Constants.BALL_DIMENSION_SIZE);
@@ -201,7 +284,7 @@ public class GUIGameBoard extends GUIPanel {
     }
 
     /**
-     * Initialize paddles with beginning values.
+     * Initialize paddles with beginning values (in the center).
      */
     private void createPaddles() {
         this.paddles = new UserPaddle[2];
@@ -219,13 +302,16 @@ public class GUIGameBoard extends GUIPanel {
      * @param right Whether the x-speed should be positive (object goes to the right) or negative (object goes to the left).
      */
     private void startBallThread(boolean right) {
+        // Set state to running
         this.gameBoard.resumeGame();
 
+        // Initialize runnable
         this.ballRunnable = () -> {
             long lastLoopTime;
             final int TARGET_FPS = 60;
             final long OPTIMAL_TIME = 1000000000 / TARGET_FPS;
 
+            // Initialize the ball's speed
             this.ball.initSpeed(right);
 
             // The pointEndingDirection is being initialized with the CURRENT round's potential out-of-bounds-rule-break
@@ -238,41 +324,46 @@ public class GUIGameBoard extends GUIPanel {
                 // Get time at the beginning of the loop to determine how long to sleep before doing next frame
                 lastLoopTime = System.nanoTime();
 
-                // Calculate new Rectangle for guiBall
-                final Rectangle size = this.ball.guiBall.getBounds();
-                float newXCoordinate = this.ball.getPosition().getCoordinates().x + this.ball.getPosition().getXvelocity();
-                float newYCoordinate = this.ball.getPosition().getCoordinates().y + this.ball.getPosition().getYvelocity();
+                // If not loop, wait for next frame directly without updating Ball
+                if (this.loop) {
+                    // Calculate new Rectangle for guiBall
+                    final Rectangle size = this.ball.guiBall.getBounds();
+                    float newXCoordinate = this.ball.getPosition().getCoordinates().x + this.ball.getPosition().getXvelocity();
+                    float newYCoordinate = this.ball.getPosition().getCoordinates().y + this.ball.getPosition().getYvelocity();
 
-                size.x = Math.round(newXCoordinate);
-                size.y = Math.round(newYCoordinate);
+                    size.x = Math.round(newXCoordinate);
+                    size.y = Math.round(newYCoordinate);
 
-                // Tell the logic part which new Rectangle the ball is inside of
-                this.ball.getPosition().setCoordinates(new Coordinates(newXCoordinate, newYCoordinate));
+                    // Tell the logic part which new Rectangle the ball is inside of
+                    this.ball.getPosition().setCoordinates(new Coordinates(newXCoordinate, newYCoordinate));
 
-                // Move the AI paddle(s)
-                this.moveAIPaddles();
+                    // Move the AI paddle(s)
+                    this.moveAIPaddles();
 
-                // Do the painting and GUI-part in the EDT (Event Dispatcher Thread)
-                // With invokeLater (which works asynchronously) because there may be a paddle update at the same time too
-                SwingUtilities.invokeLater(() -> {
-                    int twiceXVelocity = 2 * ((int) Math.round(Math.ceil(this.ball.getPosition().getXvelocity())));
+                    // Do the painting and GUI-part in the EDT (Event Dispatcher Thread)
+                    // With invokeLater (which works asynchronously) because there may be a paddle update at the same time too
+                    SwingUtilities.invokeLater(() -> {
+                        int twiceXVelocity = 2 * ((int) Math.round(Math.ceil(this.ball.getPosition().getXvelocity())));
 
-                    // Repaint immediately Rectangle around the ball, bigger than it must be, but otherwise there may be fragments hanging around
-                    this.ball.guiBall.setBounds(size);
-                    this.paintImmediately(size.x - twiceXVelocity, size.y - twiceXVelocity, size.x + twiceXVelocity, size.y + twiceXVelocity);
-                });
+                        // Repaint immediately Rectangle around the ball, bigger than it must be, but otherwise there may be fragments hanging around
+                        this.ball.guiBall.setBounds(size);
+                        this.paintImmediately(size.x - twiceXVelocity, size.y - twiceXVelocity, size.x + twiceXVelocity, size.y + twiceXVelocity);
+                    });
 
-                pointEndingDirection = this.checkForPointEnd();
+                    pointEndingDirection = this.checkForPointEnd();
 
-                // If there is an indication for an end of the point and this has already been the second loop-index with the same direction
-                if (pointEndingDirection != Directions.NONE && pointEndingDirection == lastRoundDirection) {
-                    System.out.println(pointEndingDirection);
-                    break;
+                    // If there is an indication for an end of the point and this has already been the second loop-index with the same direction
+                    if (pointEndingDirection != Directions.NONE && pointEndingDirection == lastRoundDirection) {
+                        System.out.println(pointEndingDirection);
+                        break;
+                    }
+                    lastRoundDirection = pointEndingDirection;
+
+                    // Check for not game-breaking collisions
+                    this.checkForCollision(pointEndingDirection);
                 }
-                lastRoundDirection = pointEndingDirection;
 
-                // Check for not game-breaking collisions and wait for the next frame
-                this.checkForCollision(pointEndingDirection);
+                // Wait for the next frame
                 try {
                     long waitTime = lastLoopTime - System.nanoTime() + OPTIMAL_TIME;
                     // Wait if some time is left before continuing with next frame
@@ -285,9 +376,11 @@ public class GUIGameBoard extends GUIPanel {
                 }
             }
 
-            this.endBallThread(pointEndingDirection);
+            this.pointOverEndBallThread(pointEndingDirection);
         };
 
+        // Create Thread, start Thread
+        this.loop = true;
         this.ballThread = new Thread(this.ballRunnable);
         this.ballThread.start();
     }
@@ -300,9 +393,13 @@ public class GUIGameBoard extends GUIPanel {
      *
      * @param offScreen Into which direction the ball went into the off (why the game was stopped)
      * @throws NullPointerException if the {@code parentWindow} is not set yet
+     * @see GUIGameBoard#ballThread
+     * @see GUIGameBoard#loop
      */
-    private void endBallThread(Directions offScreen) throws NullPointerException {
+    private void pointOverEndBallThread(Directions offScreen) throws NullPointerException {
+        // Interrupt the thread
         this.ballThread.interrupt();
+        this.loop = false;
 
         // Uninitialize the ball
         this.ball.uninitialize();
@@ -310,16 +407,32 @@ public class GUIGameBoard extends GUIPanel {
         // Reset game state
         this.gameBoard.setState(GameState.BETWEEN_POINTS);
         // Add a point visual as well as in the logic
-        this.gameBoard.addPoint(offScreen);
+        boolean gameOver = this.gameBoard.addPoint(offScreen);
 
-        // Direction for the next point: player who won the last point
-        // If the right player won (offScreen == LEFT), the ball should go into his direction, otherwise to the left
-        // true as second param to wait 5 seconds
-        this.parentWindow.initNextPoint(offScreen == Directions.LEFT, true);
+        if (!gameOver) {
+            // Direction for the next point: player who won the last point
+            // If the right player won (offScreen == LEFT), the ball should go into his direction, otherwise to the left
+            // true as second param to wait 5 seconds
+            this.parentWindow.initNextPoint(offScreen == Directions.LEFT, true);
+            // Nothing to do more
+            return;
+        }
+
+        // If the left player won, the winner index is 0, if the right player won, 1.
+        int winner = offScreen == Directions.LEFT ? 0 : 1;
+
+        // Show the GameOverMenu
+        this.showGameOverMenu(winner);
     }
 
     /**
      * Checks if the ball goes out of bounds (right or left).
+     *
+     * @return The Directions into which the ball goes out of bounds.
+     * @see Directions
+     * @see Directions#NONE
+     * @see Directions#LEFT
+     * @see Directions#RIGHT
      */
     private Directions checkForPointEnd() {
         // Ball goes out of bounds left
@@ -375,7 +488,7 @@ public class GUIGameBoard extends GUIPanel {
     }
 
     /**
-     * Update the x- and y-speeds for
+     * Update the x- and y-speeds for the paddle at the given index.
      *
      * @param index the (0,1) index of the paddle (right or left)
      */
@@ -410,7 +523,7 @@ public class GUIGameBoard extends GUIPanel {
      */
     private void moveLeftAIPaddle() {
         // Check if the left player is an AI
-        if (!this.getPlayers().getPlayers()[0].isAI()) return;
+        if (!this.getPlayers().getPlayersArray()[0].isAI()) return;
 
         if (this.ball.getPosition().xMovingDirection == Directions.RIGHT) {
             // The ball is moving away from the paddle
@@ -421,6 +534,7 @@ public class GUIGameBoard extends GUIPanel {
             this.paddles[0].moveTowardsBall(this.ball);
         }
 
+        // Move the gui paddle to the coordinates
         this.paddles[0].guiPaddle.moveToCoordinates();
     }
 
@@ -433,7 +547,7 @@ public class GUIGameBoard extends GUIPanel {
      */
     private void moveRightAIPaddle() {
         // Check if the left player is an AI
-        if (!this.getPlayers().getPlayers()[1].isAI()) return;
+        if (!this.getPlayers().getPlayersArray()[1].isAI()) return;
 
         if (this.ball.getPosition().xMovingDirection == Directions.LEFT) {
             // The ball is moving away from the paddle
@@ -444,6 +558,7 @@ public class GUIGameBoard extends GUIPanel {
             this.paddles[1].moveTowardsBall(this.ball);
         }
 
+        // Move the gui paddle to the coordinates
         this.paddles[1].guiPaddle.moveToCoordinates();
     }
 
@@ -462,6 +577,30 @@ public class GUIGameBoard extends GUIPanel {
 
         // Difference between negative max ball y-speed and positive max ball y-speed
         return Constants.MAX_BALL_Y_SPEED * ballPaddleDifference / ((paddleHeight + ballHeight) / 2);
+    }
+
+    /**
+     * Dispose the parent window and show a {@code GameOverMenu}.
+     *
+     * @param winner (0-1) The winner's index (left = 0; right = 1)
+     * @see GameOverMenu
+     * @see guigame.gui.menu.GUIGameOverMenu
+     * @see GUIGameOverWindow
+     */
+    private void showGameOverMenu(int winner) {
+        // Parent window not needed anymore, new one will be created anyway
+        // Must happen in EDT, otherwise there will be an InterruptedException
+        SwingUtilities.invokeLater(() -> {
+            this.parentWindow.dispose();
+            System.out.println("Disposed");
+        });
+
+        // Now for the game over menu:
+        // Create a new StartGameEventListener
+        StartGameEventListener startGameEventListener = new StartGameEventListener();
+
+        // Create a logic-GameOverMenu, a window for it will pop up.
+        new GameOverMenu(startGameEventListener, this.getPlayers(), winner);
     }
 
     /**
@@ -515,7 +654,118 @@ public class GUIGameBoard extends GUIPanel {
         this.paddles[1].getPosition().getCoordinates().y = size.y;
     }
 
+    /**
+     * @return the current {@code GameState}
+     */
     public GameState getState() {
         return this.gameBoard.getState();
+    }
+
+    /**
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when escape is pressed.
+     */
+    @Override
+    public void escapePressed() {
+        // TODO: Open pause menu
+        switch (this.getState()) {
+            case RUNNING -> this.gameBoard.pauseGame();
+            case PAUSED -> this.gameBoard.resumeGame();
+            case BETWEEN_POINTS -> this.gameBoard.showPauseBetweenPoints();
+            case PAUSED_BETWEEN_POINTS -> this.gameBoard.resumeBetweenPoints();
+        }
+    }
+
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when the arrow to the left is pressed.
+     */
+    @Override
+    public void leftArrowPressed() {
+    }
+
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when the arrow to the top is pressed.
+     */
+    @Override
+    public void topArrowPressed() {
+    }
+
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when the arrow to the right is pressed.
+     */
+    @Override
+    public void rightArrowPressed() {
+    }
+
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when the arrow to the bottom is pressed.
+     */
+    @Override
+    public void bottomArrowPressed() {
+    }
+
+    /**
+     * EMPTY!!!
+     * From {@code KeyboardButtonAdapter}.
+     * Invoked when any other key is pressed.
+     *
+     * @param key The key which is pressed
+     * @see KeyboardButtonAdapter#escapePressed()
+     * @see KeyboardButtonAdapter#leftArrowPressed()
+     * @see KeyboardButtonAdapter#topArrowPressed()
+     * @see KeyboardButtonAdapter#rightArrowPressed()
+     * @see KeyboardButtonAdapter#bottomArrowPressed()
+     */
+    @Override
+    public void otherKeyPressed(int key) {
+    }
+
+    /**
+     * EMPTY!!!
+     * From {@code KeyListener}.
+     * Invoked when a key has been typed.
+     * See the class description for {@link KeyEvent} for a definition of
+     * a key typed event.
+     *
+     * @param e the event to be processed
+     */
+    @Override
+    public void keyTyped(KeyEvent e) {
+        System.out.println("Key-event in GUIGameBoard");
+        new KeyboardPressedEvent(this.keyboardPressedEventListener, e.getKeyCode()).action();
+    }
+
+    /**
+     * From {@code KeyListener}.
+     * EMPTY!!!
+     * Invoked when a key has been pressed.
+     * See the class description for {@link KeyEvent} for a definition of
+     * a key pressed event.
+     *
+     * @param e the event to be processed
+     */
+    @Override
+    public void keyPressed(KeyEvent e) {
+    }
+
+    /**
+     * EMPTY!!!
+     * From {@code KeyListener}.
+     * Invoked when a key has been released.
+     * See the class description for {@link KeyEvent} for a definition of
+     * a key released event.
+     *
+     * @param e the event to be processed
+     */
+    @Override
+    public void keyReleased(KeyEvent e) {
     }
 }

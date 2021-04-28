@@ -8,10 +8,15 @@ import guigame.logic.players.Player;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
-public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseMotionListener {
+/**
+ * Window for the {@code GUIGameBoard}.
+ * Implements {@code MouseMotionListener} to move the paddles.
+ *
+ * @see GUIGameBoard
+ */
+public class GUIGameBoardWindow extends JWindow implements MouseMotionListener {
     GUIGameBoard guiGameBoard;
     private boolean guiBoardShown;
 
@@ -20,6 +25,14 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
     private JLabel pointWinningLabel;
     private boolean useLabel = false;
 
+    /**
+     * Create a new {@code GUIGameBoardWindow},
+     * initialize it and
+     * set it visible.
+     *
+     * @param guiGameBoard the {@code GUIGameBoard to show}
+     * @see GUIGameBoard
+     */
     public GUIGameBoardWindow(GUIGameBoard guiGameBoard) {
         // Init basic JWindow
         super();
@@ -118,7 +131,7 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
     public void showPointWinningLabel(boolean right) {
         // -------------------- Logic for the label --------------------
         // Get players
-        Player[] players = this.guiGameBoard.getPlayers().getPlayers();
+        Player[] players = this.guiGameBoard.getPlayers().getPlayersArray();
         Player winningPlayer = players[right ? 1 : 0];
         // Get text for label
         String pointWinningText = winningPlayer.getPointWinningTextAgainst(players[right ? 0 : 1]);
@@ -204,60 +217,5 @@ public class GUIGameBoardWindow extends JWindow implements MouseListener, MouseM
         if (this.guiGameBoard.getState() == GameState.RUNNING && this.guiGameBoard.rightIsHuman()) {
             this.guiGameBoard.updateRightPaddle(e.getY());
         }
-    }
-
-    /**
-     * EMPTY!!!
-     * Invoked when the mouse button has been clicked (pressed
-     * and released) on a component.
-     *
-     * @param e the event to be processed
-     */
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        System.out.println("Clicked");
-    }
-
-    /**
-     * Invoked when a mouse button has been pressed on a component.
-     *
-     * @param e the event to be processed
-     */
-    @Override
-    public void mousePressed(MouseEvent e) {
-        System.out.println("Mouse pressed in GUIGameBoardWindow, could also invoke start next point from here");
-    }
-
-    /**
-     * EMPTY!!!
-     * Invoked when a mouse button has been released on a component.
-     *
-     * @param e the event to be processed
-     */
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        System.out.println("Released");
-    }
-
-    /**
-     * EMPTY!!!
-     * Invoked when the mouse enters a component.
-     *
-     * @param e the event to be processed
-     */
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        System.out.println("Entered");
-    }
-
-    /**
-     * EMPTY!!!
-     * Invoked when the mouse exits a component.
-     *
-     * @param e the event to be processed
-     */
-    @Override
-    public void mouseExited(MouseEvent e) {
-        System.out.println("Exited");
     }
 }
