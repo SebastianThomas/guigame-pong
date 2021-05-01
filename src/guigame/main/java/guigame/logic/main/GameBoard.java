@@ -8,15 +8,38 @@ import guigame.logic.players.Players;
  * Class to represent the Game Board in the game. Only when state == RUNNING, PAUSE or BETWEEN_POINTS
  */
 public class GameBoard {
+    /**
+     * {@code GameBoard}'s width
+     */
     private final int width;
+    /**
+     * {@code GameBoard}'s height
+     */
     private final int height;
 
+    /**
+     * Parent main game
+     */
     private final MainGame mainGame;
 
+    /**
+     * Whether a human is playing or not
+     */
     private final boolean human;
+    /**
+     * The current score:
+     * [0]: left player
+     * [1]: right player
+     */
     private final int[] score;
 
+    /**
+     * GUI-part
+     */
     private GUIGameBoard guiBoard;
+    /**
+     * Current state of the game
+     */
     private GameState gameState;
 
     // TODO: Implement further checkout for loop which is only assigned but not used
@@ -81,13 +104,13 @@ public class GameBoard {
         int index = right ? 1 : 0;
         this.score[index] += 1;
 
+        // Update points
         this.guiBoard.updatePointLabels(index);
 
+        // If one player has won
         if (this.score[index] >= Constants.WINNING_SCORE) {
+            // Set GameState
             this.setState(GameState.GAME_OVER_MENU);
-            // TODO: Show game over menu
-//            TODO: remove this.showGameOverMenu();
-            System.out.println("Show game over menu");
             return true;
         }
         return false;

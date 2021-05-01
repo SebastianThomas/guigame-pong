@@ -10,8 +10,12 @@ public class ButtonListener implements EventListener {
     public ButtonListener() {
     }
 
+    /**
+     * EMPTY!!!
+     * Invoked when the Button is clicked
+     * .
+     */
     @Override
     public void actionPerformed(Event e) {
-
     }
 }

@@ -15,9 +15,17 @@ import java.awt.*;
 /**
  * An implementation of {@code GUIMenu} for the {@code MainMenu}:
  * Set settings for the game and start it from this menu.
+ *
+ * @see MainMenu
  */
 public class GUIMainMenu extends GUIMenu {
+    /**
+     * {@code Players} to modify
+     */
     private final Players players;
+    /**
+     * Logic-part
+     */
     private final MainMenu mainMenu;
 
     /**
@@ -55,7 +63,7 @@ public class GUIMainMenu extends GUIMenu {
         GUILabel guiLabel = new GUILabel("PONG", 40);
 
         // Add label
-        this.addComponent(guiLabel, 0, 0, 2, 10);
+        this.addComponent(guiLabel, 0, 0, 2, 1, 10);
     }
 
     /**
@@ -66,11 +74,14 @@ public class GUIMainMenu extends GUIMenu {
     private void createButtons(StartGameEvent startGameEvent) {
         // Create start game button and show it
         StartGameBaseButton startButton = new StartGameBaseButton(startGameEvent);
-        this.addComponent(startButton, 0, 1, 1, 10);
+        this.addComponent(startButton, 0, 1, 1, 1, 10);
 
         // Create a select user submenu and show it
         GUISelectUsersSubmenu guiSelectUsersSubmenu = new GUISelectUsersSubmenu(this.players);
-        this.addComponent(guiSelectUsersSubmenu, 0, 2, 2, 10);
+        // Add name inputs
+        this.addComponent(guiSelectUsersSubmenu.getTextFieldPanel(), 0, 2, 1, 2, 2);
+        // Add sliders
+        this.addComponent(guiSelectUsersSubmenu, 0, 3, 1, 2, 2);
     }
 
     /**
@@ -88,13 +99,15 @@ public class GUIMainMenu extends GUIMenu {
         // Panel as container for label and slider (ai-difficulty)
         GridLayout aiDiffGridLayout = new GridLayout(2, 1);
         JPanel aiDiffPanel = new JPanel(aiDiffGridLayout);
+        // Set panel colors
         aiDiffPanel.setForeground(Constants.fgColor);
         aiDiffPanel.setBackground(Constants.bgColor);
+        // Add label and slider to panel
         aiDiffPanel.add(aiDiffLabel);
         aiDiffPanel.add(aiDifficulty);
 
         // Add panel to menu
-        this.addComponent(aiDiffPanel, 0, 3, 2, 5);
+        this.addComponent(aiDiffPanel, 0, 4, 2, 1, 5);
 
         // Initial ball speed
         // Slider for the initial ball speed
@@ -107,13 +120,15 @@ public class GUIMainMenu extends GUIMenu {
         // Panel as container for label and slider (ball speed)
         GridLayout ballSpeedGridLayout = new GridLayout(2, 1);
         JPanel ballSpeedPanel = new JPanel(ballSpeedGridLayout);
+        // Set panel colors
         ballSpeedPanel.setForeground(Constants.fgColor);
         ballSpeedPanel.setBackground(Constants.bgColor);
+        // Add label and slider to panel
         ballSpeedPanel.add(ballSpeedLabel);
         ballSpeedPanel.add(ballSpeed);
 
         // Add panel to menu
-        this.addComponent(ballSpeedPanel, 0, 4, 2, 20);
+        this.addComponent(ballSpeedPanel, 0, 5, 2, 1, 10);
     }
 
     /**
@@ -123,20 +138,25 @@ public class GUIMainMenu extends GUIMenu {
      * @param x         x-position for the new component
      * @param y         y-position for the new component
      * @param weightx   weightx of the component
+     * @param weighty   weighty of the component
      * @param pady      y-padding around the component
      */
-    private void addComponent(JComponent component, int x, int y, int weightx, int pady) {
+    private void addComponent(JComponent component, int x, int y, int weighty, int weightx, int pady) {
         // Set params
         this.constraints.gridx = x;
         this.constraints.gridy = y;
 
+        // Insets
         this.constraints.insets = new Insets(pady, 20, pady, 20);
 
+        // x-direction weight
         this.constraints.weightx = weightx;
 
         // Fill horizontally and center
         this.constraints.fill = GridBagConstraints.HORIZONTAL;
         this.constraints.anchor = GridBagConstraints.CENTER;
+
+        this.constraints.weighty = weighty;
 
         // Add component
         this.add(component, this.constraints);

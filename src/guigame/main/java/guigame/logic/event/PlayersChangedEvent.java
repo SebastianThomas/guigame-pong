@@ -8,6 +8,8 @@ package guigame.logic.event;
  */
 public class PlayersChangedEvent implements Event {
     private final int nrOfHumans;
+    private final int index;
+    private final String name;
     private final PlayersChangedEventListener l;
 
     /**
@@ -22,6 +24,28 @@ public class PlayersChangedEvent implements Event {
     public PlayersChangedEvent(PlayersChangedEventListener l, int nrOfHumans) {
         this.l = l;
         this.nrOfHumans = nrOfHumans;
+
+        this.index = -1;
+        this.name = null;
+    }
+
+    /**
+     * Initialize a new {@code PlayersChangedEvent}.
+     * You should fire the event immediately by calling the {@code action}-method.
+     *
+     * @param l     A listener to report the action to
+     * @param index the index of the player to change the name
+     * @param name  the new name for the player at index
+     * @see PlayersChangedEventListener
+     * @see PlayersChangedEvent#action()
+     */
+    public PlayersChangedEvent(PlayersChangedEventListener l, int index, String name) {
+        this.l = l;
+
+        this.nrOfHumans = -1;
+
+        this.index = index;
+        this.name = name;
     }
 
     /**
@@ -39,5 +63,21 @@ public class PlayersChangedEvent implements Event {
      */
     public int getNrOfHumans() {
         return this.nrOfHumans;
+    }
+
+    /**
+     * @return the index for the player whose name changed
+     * @see PlayersChangedEvent#getNewName()
+     */
+    public int getIndex() {
+        return this.index;
+    }
+
+    /**
+     * @return the new name for the player at the given index
+     * @see PlayersChangedEvent#getIndex()
+     */
+    public String getNewName() {
+        return this.name;
     }
 }

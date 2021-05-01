@@ -68,7 +68,13 @@ public class GUISlider extends JSlider {
  * Implementation of {@code BasicSliderUI}: style of a {@code GUISlider}.
  */
 class GUISliderUI extends BasicSliderUI {
+    /**
+     * Color of the thumb
+     */
     private final Color thumbColor;
+    /**
+     * Color of the track
+     */
     private final Color trackColor;
 
     /**
@@ -90,6 +96,7 @@ class GUISliderUI extends BasicSliderUI {
         this.thumbColor = Constants.fgColor;
         this.trackColor = Constants.sliderMarkedColor;
 
+        // Set slider colors
         this.slider.setForeground(Constants.fgColor);
         this.slider.setBackground(Constants.bgColor);
     }
@@ -111,15 +118,18 @@ class GUISliderUI extends BasicSliderUI {
             this.paintTrack(g);
         }
         if (clip.intersects(this.tickRect)) {
+            // Paint ticks
             this.paintTicks(g);
         }
         if (clip.intersects(this.labelRect)) {
+            // Paint labels
             this.paintLabels(g);
         }
         if (this.slider.hasFocus() && clip.intersects(this.focusRect)) {
             this.paintFocus(g);
         }
         if (clip.intersects(thumbRect)) {
+            // Draw thumb
             Color savedColor = this.slider.getBackground();
             this.slider.setBackground(this.thumbColor);
             this.paintThumb(g);
@@ -134,6 +144,7 @@ class GUISliderUI extends BasicSliderUI {
      */
     @Override
     public void paintTrack(Graphics g) {
+        // Calculate track widths (heights are the same)
         int emptyTrackWidth = (this.trackRect.width + this.trackRect.x) - this.thumbRect.x;
         int filledTrackWidth = this.trackRect.width - emptyTrackWidth;
 
@@ -148,6 +159,8 @@ class GUISliderUI extends BasicSliderUI {
 
     /**
      * Paints the thumb (ball).
+     *
+     * @param g The graphics to paint on
      */
     @Override
     public void paintThumb(Graphics g) {

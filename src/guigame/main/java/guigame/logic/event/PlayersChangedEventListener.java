@@ -21,9 +21,23 @@ public class PlayersChangedEventListener implements EventListener {
         this.subMenu = subMenu;
     }
 
+    /**
+     * Invoke when a change with the number of humans occures.
+     *
+     * @param e A {@code PlayersChangedEvent} with the new number of humans
+     * @see PlayersChangedEvent
+     */
     @Override
     public void actionPerformed(Event e) {
+        // Data type conversion to get the number of humans
         PlayersChangedEvent event = (PlayersChangedEvent) e;
-        this.subMenu.playersChanged(event.getNrOfHumans());
+        if (event.getNrOfHumans() != -1) {
+            // Invoke the event on submenu with the number of humans
+            this.subMenu.playersChanged(event.getNrOfHumans());
+            return;
+        }
+
+        // Invoke the event on submenu with the player's new name
+        this.subMenu.playersChanged(event.getIndex(), event.getNewName());
     }
 }

@@ -113,10 +113,18 @@ public class GameOverMenu extends Menu {
         return this.guiOwner;
     }
 
+    /**
+     * Format a {@code String} to show which player has won.
+     *
+     * @see GameOverMenu#winner
+     */
     public String getWinnerMessage() {
         return String.format("Spieler %d (%s) hat gewonnen!", this.winner + 1, this.players.getPlayersArray()[winner].getName());
     }
 
+    /**
+     * @return the {@code GUIGameOverMenu}
+     */
     public GUIGameOverMenu getGuiMenu() {
         return this.guiMenu;
     }

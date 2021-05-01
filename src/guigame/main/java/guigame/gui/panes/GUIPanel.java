@@ -15,8 +15,10 @@ public class GUIPanel extends JPanel {
      * Create a new {@code GUIPanel} with the predefined colors.
      */
     public GUIPanel() {
+        // Init JPanel
         super();
 
+        // Set the right colors
         this.initColors();
     }
 
@@ -32,7 +34,8 @@ public class GUIPanel extends JPanel {
     }
 
     /**
-     * Removes all children and then repaints and revalidates the Panel.
+     * Removes all children
+     * and then repaints and revalidates the Panel.
      */
     @Override
     public void removeAll() {

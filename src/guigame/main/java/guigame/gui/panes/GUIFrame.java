@@ -12,20 +12,6 @@ import javax.swing.*;
  */
 public class GUIFrame extends JFrame {
     /**
-     * Initialize a new {@code GUIFrame} and set the right colors.
-     * Does not show the frame; invoke {@code setVisible(true)} to show it.
-     *
-     * @see JFrame#setVisible(boolean)
-     * @see Constants#fgColor
-     * @see Constants#bgColor
-     */
-    public GUIFrame() {
-        super();
-
-        this.initColors();
-    }
-
-    /**
      * Initialize a new {@code GUIFrame} with a specific title and set the right colors.
      * Does not show the frame; invoke {@code setVisible(true)} to show it.
      *
@@ -37,6 +23,12 @@ public class GUIFrame extends JFrame {
     public GUIFrame(String title) {
         super(title);
 
+        this.initialize();
+    }
+
+    private void initialize() {
+        this.setLocationRelativeTo(null);
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.initColors();
     }
 

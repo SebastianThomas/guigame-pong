@@ -25,11 +25,11 @@ public abstract class Constants {
     /**
      * The height of the {@code GameBoard}
      */
-    public static final int GAME_BOARD_HEIGHT = 500;
+    public static final int GAME_BOARD_HEIGHT = 550;
     /**
      * The width of the {@code GameBoard}
      */
-    public static final int GAME_BOARD_WIDTH = 750;
+    public static final int GAME_BOARD_WIDTH = 900;
     /**
      * The height and width for the {@code Ball}.
      */
@@ -50,7 +50,7 @@ public abstract class Constants {
     /**
      * End game at a max score of 5 points for one person
      */
-    public static int WINNING_SCORE = 5;
+    public static int WINNING_SCORE = 1;
 
     /**
      * The max speed of an AI player.

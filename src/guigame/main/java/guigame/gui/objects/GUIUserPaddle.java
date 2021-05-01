@@ -18,10 +18,22 @@ public class GUIUserPaddle extends JComponent {
     @Serial
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Logic-{@code UserPaddle} to get parameters from.
+     */
     private final UserPaddle userPaddle;
+    /**
+     * Paddle height
+     */
     private final int height;
+    /**
+     * Paddle width
+     */
     private final int width;
 
+    /**
+     * Current position
+     */
     private final Position position;
 
     /**
@@ -40,6 +52,7 @@ public class GUIUserPaddle extends JComponent {
         this.height = this.userPaddle.getHeight();
         this.width = this.userPaddle.getWidth();
 
+        // Set position (from Logic-UserPaddle)
         this.position = this.userPaddle.getPosition();
 
         // Set GUI-location and -size
@@ -60,12 +73,14 @@ public class GUIUserPaddle extends JComponent {
     public static int normalizeYOffset(int paddleLeftYOffset, int wholeHeight) {
         // Calculate new offset
         int newOffset = paddleLeftYOffset - UserPaddle.HEIGHT / 2;
-        // If it should be higher than 0, set it to 0
+        // If it should be higher than 0
         if (newOffset < 0) {
+            // Set it to 0
             newOffset = 0;
         }
-        // If it is out of the window, set it to the highest possible point
+        // If it is out of the window:
         if (newOffset + UserPaddle.HEIGHT > wholeHeight) {
+            // Set it to the highest possible point
             newOffset = wholeHeight - UserPaddle.HEIGHT;
         }
         // Return the normalized offset
@@ -90,8 +105,10 @@ public class GUIUserPaddle extends JComponent {
      */
     @Override
     public void paintComponent(Graphics g) {
+        // Set the right color
         g.setColor(Constants.fgColor);
 
+        // Draw paddle rect
         g.fillRect(0, 0, this.width, this.height);
     }
 

@@ -331,6 +331,7 @@ public class GUIGameBoard extends GUIPanel implements KeyListener, KeyboardButto
                     float newXCoordinate = this.ball.getPosition().getCoordinates().x + this.ball.getPosition().getXvelocity();
                     float newYCoordinate = this.ball.getPosition().getCoordinates().y + this.ball.getPosition().getYvelocity();
 
+                    // Set new ball position
                     size.x = Math.round(newXCoordinate);
                     size.y = Math.round(newYCoordinate);
 
@@ -419,7 +420,7 @@ public class GUIGameBoard extends GUIPanel implements KeyListener, KeyboardButto
         }
 
         // If the left player won, the winner index is 0, if the right player won, 1.
-        int winner = offScreen == Directions.LEFT ? 0 : 1;
+        int winner = offScreen == Directions.LEFT ? 1 : 0;
 
         // Show the GameOverMenu
         this.showGameOverMenu(winner);

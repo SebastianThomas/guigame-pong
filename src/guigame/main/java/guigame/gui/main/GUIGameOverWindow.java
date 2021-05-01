@@ -1,7 +1,7 @@
 package guigame.gui.main;
 
 import guigame.gui.menu.GUIGameOverMenu;
-import guigame.logic.Constants;
+import guigame.gui.panes.GUIFrame;
 
 import javax.swing.*;
 
@@ -19,7 +19,7 @@ import javax.swing.*;
  * - back to main menu
  * </p>
  */
-public class GUIGameOverWindow extends JFrame {
+public class GUIGameOverWindow extends GUIFrame {
     private final GUIGameOverMenu guiGameOverMenu;
     private int width = 750;
     private int height = 300;
@@ -47,10 +47,6 @@ public class GUIGameOverWindow extends JFrame {
         this.setSize(this.width, this.height);
         // Place in the middle
         this.setLocationRelativeTo(null);
-
-        // Set the right colors
-        this.setForeground(Constants.fgColor);
-        this.setBackground(Constants.bgColor);
 
         // Add the GUI-menu
         this.add(this.guiGameOverMenu);

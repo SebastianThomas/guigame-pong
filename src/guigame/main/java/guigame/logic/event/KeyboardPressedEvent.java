@@ -4,7 +4,15 @@ package guigame.logic.event;
  * Implementation of the {@code Event} which should be fired when a key on the keyboard is pressed.
  */
 public class KeyboardPressedEvent implements Event {
+    /**
+     * Listener to notify when the Event is fired
+     */
     private final KeyboardPressedEventListener l;
+    /**
+     * The pressed button to be transmitted to {@code KeyboardPressedEventListener}.
+     *
+     * @see KeyboardPressedEventListener
+     */
     private final int button;
 
     /**

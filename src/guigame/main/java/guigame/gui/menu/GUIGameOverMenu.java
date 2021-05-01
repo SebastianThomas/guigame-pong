@@ -20,12 +20,10 @@ import java.awt.*;
  */
 public class GUIGameOverMenu extends GUIMenu {
     private Players players;
-    private GameOverMenu gameOverMenu;
-    private StartGameEvent startGameEvent;
+    private final GameOverMenu gameOverMenu;
+    private final StartGameEvent startGameEvent;
 
-    private String msg;
-
-    private int columns = 2;
+    private final String msg;
 
     /**
      * Uses a "normal" {@code GridLayout} instead of the {@code GridBagLayout} from {@code GUIMenu}.

@@ -29,7 +29,7 @@ public class GameWindow extends GUIFrame implements KeyListener {
      * @see guigame.logic.event.StartGameEventListener
      */
     public GameWindow(int width, int height, KeyboardPressedEventListener keyboardPressedEventListener) {
-        super();
+        super("Pont - Java GUI");
         this.size = new int[]{width, height};
 
         this.keyboardPressedEventListener = keyboardPressedEventListener;
