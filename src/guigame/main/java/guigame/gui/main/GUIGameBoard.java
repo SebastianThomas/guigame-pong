@@ -591,7 +591,8 @@ public class GUIGameBoard extends GUIPanel implements KeyListener, KeyboardButto
         float ballPaddleDifference = -1 * (paddleycenter - ballycenter);
 
         // ratio between maximum/current y-speed and current x-speed should always stay the same
-        float maxBallYSpeed = xSpeed / 3 * Constants.MAX_BALL_Y_SPEED;
+        // x-speed of the ball may be negative if the ball goes to the left and positive if to the right
+        float maxBallYSpeed = Math.abs(xSpeed) / 3 * Constants.MAX_BALL_Y_SPEED;
 
         // Difference between negative max ball y-speed and positive max ball y-speed
         return maxBallYSpeed * ballPaddleDifference / ((paddleHeight + ballHeight) / 2);
