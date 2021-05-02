@@ -8,5 +8,8 @@ package guigame.logic.event;
  */
 @FunctionalInterface
 public interface Event {
+    /**
+     * Trigger the event.
+     */
     void action();
 }

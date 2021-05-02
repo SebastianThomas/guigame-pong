@@ -13,9 +13,21 @@ import guigame.logic.Position;
  * @see GUIBall
  */
 public class Ball {
+    /**
+     * Ball's height
+     */
     private final int height;
+    /**
+     * Ball's width
+     */
     private final int width;
+    /**
+     * Ball's position
+     */
     private final Position position;
+    /**
+     * GUI-counterpart for this Ball
+     */
     public GUIBall guiBall;
 
     /**
@@ -43,6 +55,9 @@ public class Ball {
 
     /**
      * Sets the initial position of the ball.
+     *
+     * @param x the initial x-coordinate
+     * @param y the initial y-coordinate
      */
     public void setInitialPositions(int x, int y) {
         this.position.setInitialPositions(x, y);

@@ -1,5 +1,8 @@
 package guigame.logic.event;
 
+/**
+ * Adapter for keyboard presses.
+ */
 public interface KeyboardButtonAdapter {
     /**
      * From {@code KeyboardButtonAdapter}.

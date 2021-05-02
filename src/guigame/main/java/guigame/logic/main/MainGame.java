@@ -1,6 +1,6 @@
 package guigame.logic.main;
 
-import guigame.gui.main.GameWindow;
+import guigame.gui.main.GUIGameWindow;
 import guigame.logic.event.KeyboardButtonAdapter;
 import guigame.logic.event.KeyboardPressedEventListener;
 import guigame.logic.event.StartGameEventListener;
@@ -11,20 +11,49 @@ import javax.swing.*;
 
 /**
  * Logic part to {@code GUIMainGame}.
- * Shows the {@code GameWindow} and from here, the game is started (with GUI).
+ * Shows the {@code GUIGameWindow} and from here, the game is started (with GUI).
  */
 public class MainGame implements KeyboardButtonAdapter {
+    /**
+     * Game height.
+     */
     private final int height;
+    /**
+     * Game width.
+     */
     private final int width;
+    /**
+     * {@code EventListener} to trigger when game should be started.
+     */
     private StartGameEventListener startGameEventListener;
+    /**
+     * Players (to be configured)
+     */
     private Players players;
 
-    private GameWindow window;
-    private GameBoard gameBoard;
+    /**
+     * Window inside which the {@code MainGame} is shown.
+     */
+    private GUIGameWindow window;
+    /**
+     * {@code MainMenu} to show at the beginning
+     */
     private MainMenu mainMenu;
+    /**
+     * {@code GameBoard} to create window for when game is started.
+     */
+    private GameBoard gameBoard;
 
+    /**
+     * Listener to report keyboard presses to.
+     */
     private KeyboardPressedEventListener keyboardPressedEventListener;
 
+    /**
+     * The current {@code GameState}.
+     *
+     * @see MainGame#changeState(GameState)
+     */
     private GameState state;
 
     /**
@@ -94,12 +123,12 @@ public class MainGame implements KeyboardButtonAdapter {
     }
 
     /**
-     * Create a {@code GameWindow}, then show it.
+     * Create a {@code GUIGameWindow}, then show it.
      *
-     * @see GameWindow
+     * @see GUIGameWindow
      */
     private void createGameWindow() {
-        this.window = new GameWindow(this.width, this.height, this.keyboardPressedEventListener);
+        this.window = new GUIGameWindow(this.width, this.height, this.keyboardPressedEventListener);
         showGameWindow(this.window, true);
     }
 
@@ -138,6 +167,7 @@ public class MainGame implements KeyboardButtonAdapter {
     /**
      * Changes the current MainGame's {@code GameState}.
      *
+     * @param newState new game state for the game
      * @see GameState
      */
     public void changeState(GameState newState) {

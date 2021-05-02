@@ -15,6 +15,7 @@ public class StartGameBaseButton extends BaseButton {
      * Initialize a new StartGameBaseButton with a text of "Start" and a font-size of 20.
      * Then adds the action listener to fire the {@code action} method of the {@code StartGameEvent} on click.
      *
+     * @param startGameEvent the {@code StartGameEvent} to fire on click
      * @see StartGameEvent
      */
     public StartGameBaseButton(StartGameEvent startGameEvent) {

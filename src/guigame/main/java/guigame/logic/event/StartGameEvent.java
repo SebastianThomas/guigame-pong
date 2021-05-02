@@ -6,6 +6,9 @@ package guigame.logic.event;
  * @see StartGameEventListener
  */
 public class StartGameEvent implements Event {
+    /**
+     * Listener to report {@code StartGameEvent (this)} to.
+     */
     private StartGameEventListener l;
 
     /**

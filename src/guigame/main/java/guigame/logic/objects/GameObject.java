@@ -2,6 +2,10 @@ package guigame.logic.objects;
 
 import guigame.logic.Position;
 
+/**
+ * Abstract for a {@code GameObject} in the logic.
+ * Each {@code GameObject} has a specific height, width and position as well as a bunch of setters and getters.
+ */
 public abstract class GameObject {
     /**
      * The {@code GameObject}'s position
@@ -20,6 +24,10 @@ public abstract class GameObject {
     /**
      * Create a new {@code GameObject}.
      *
+     * @param x      the initial x-position
+     * @param y      the initial y-position
+     * @param height height of this object
+     * @param width  width of this object
      * @see Position
      */
     public GameObject(int x, int y, int height, int width) {

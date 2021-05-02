@@ -1,0 +1,16 @@
+module:guigame
+guigame.gui.borders
+guigame.gui.main
+guigame.gui.menu
+guigame.gui.menu.submenus
+guigame.gui.objects
+guigame.gui.panes
+guigame.gui.panes.buttons
+guigame.logic
+guigame.logic.event
+guigame.logic.event.askers
+guigame.logic.exceptions
+guigame.logic.main
+guigame.logic.menu
+guigame.logic.objects
+guigame.logic.players

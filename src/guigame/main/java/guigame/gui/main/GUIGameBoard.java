@@ -30,14 +30,23 @@ import java.awt.event.KeyListener;
  * @see GUIGameBoardWindow
  */
 public class GUIGameBoard extends GUIPanel implements KeyListener, KeyboardButtonAdapter {
+    /**
+     * The {@code EventListener} to report key presses to.
+     */
     private final KeyboardPressedEventListener keyboardPressedEventListener;
 
+    /**
+     * The logic-part of the {@code GUIGameBoard} (this).
+     */
     private final GameBoard gameBoard;
 
     /**
-     * Width and height for the {@code GameBoard}.
+     * Width for the {@code GameBoard}.
      */
     private final int width;
+    /**
+     * Height for the {@code GameBoard}.
+     */
     private final int height;
 
     /**
@@ -564,7 +573,10 @@ public class GUIGameBoard extends GUIPanel implements KeyListener, KeyboardButto
     }
 
     /**
+     * Calculate the new y-direction speed for the ball based on a {@code GUIUserPaddle} it collides with.
+     *
      * @param paddle Index for the paddle with which the ball collides
+     * @return the new ball y-direction speed
      */
     private float calculateYBallSpeed(int paddle) {
         float ballHeight = this.ball.getHeight();

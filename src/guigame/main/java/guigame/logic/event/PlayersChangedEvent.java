@@ -7,9 +7,25 @@ package guigame.logic.event;
  * @see guigame.logic.menu.MainMenu
  */
 public class PlayersChangedEvent implements Event {
+    /**
+     * The (potentially new) number of humans playing.
+     */
     private final int nrOfHumans;
+    /**
+     * Index of the player whose name was changed.
+     *
+     * @see PlayersChangedEvent#name
+     */
     private final int index;
+    /**
+     * New name of the player.
+     *
+     * @see PlayersChangedEvent#index
+     */
     private final String name;
+    /**
+     * Listener to notify that a change occurs.
+     */
     private final PlayersChangedEventListener l;
 
     /**

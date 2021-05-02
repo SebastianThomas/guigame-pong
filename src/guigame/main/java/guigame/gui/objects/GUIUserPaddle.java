@@ -15,6 +15,11 @@ import java.io.Serial;
  * @see UserPaddle
  */
 public class GUIUserPaddle extends JComponent {
+    /**
+     * Serialization
+     *
+     * @see Serial
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 

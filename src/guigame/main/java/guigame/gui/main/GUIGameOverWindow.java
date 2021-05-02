@@ -20,8 +20,17 @@ import javax.swing.*;
  * </p>
  */
 public class GUIGameOverWindow extends GUIFrame {
+    /**
+     * {@code GUIGameOverMenu} to show.
+     */
     private final GUIGameOverMenu guiGameOverMenu;
+    /**
+     * Fixed width for the window
+     */
     private int width = 750;
+    /**
+     * Fixed height for the window
+     */
     private int height = 300;
 
     /**

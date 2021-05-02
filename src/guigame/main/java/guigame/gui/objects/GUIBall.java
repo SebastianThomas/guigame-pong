@@ -13,6 +13,11 @@ import java.io.Serial;
  * It has a position, width and height as well as a {@code Ball} it belongs to.
  */
 public class GUIBall extends JComponent {
+    /**
+     * Serialization
+     *
+     * @see Serial
+     */
     @Serial
     private static final long serialVersionUID = 1L;
 

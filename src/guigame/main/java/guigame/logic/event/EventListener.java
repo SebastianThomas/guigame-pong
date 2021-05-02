@@ -8,5 +8,10 @@ package guigame.logic.event;
  */
 @FunctionalInterface
 public interface EventListener {
+    /**
+     * Invoke when a fitting {@code Event} was triggered.
+     *
+     * @param e the {@code Event} to get options from (should be a subclass of {@code Event})
+     */
     void actionPerformed(Event e);
 }

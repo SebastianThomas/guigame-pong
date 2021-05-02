@@ -9,9 +9,12 @@ package guigame.logic.menu;
  */
 public class PauseMenu extends Menu {
     /**
-     * Height of the Overlay
+     * Width of the Overlay
      */
     private int width;
+    /**
+     * Height of the Overlay
+     */
     private int height;
 
     /**

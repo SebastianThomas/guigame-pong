@@ -9,10 +9,25 @@ package guigame.logic.main;
  * @see guigame.gui.main.GUIGameBoard
  */
 public enum Directions {
+    /**
+     * Negatively into y-direction
+     */
     UP,
+    /**
+     * Positively into y-direction
+     */
     DOWN,
-    RIGHT,
+    /**
+     * Negatively into x-direction
+     */
     LEFT,
+    /**
+     * Positively into x-direction
+     */
+    RIGHT,
 
+    /**
+     * None of the above specified (in the current context)
+     */
     NONE
 }

@@ -15,6 +15,9 @@ public class LeaveGameAsker implements EventListener {
      * The label for "yes"-button
      */
     private static final String yesLeaveLabelString = "Ja";
+    /**
+     * The option pane the asker creates and displays.
+     */
     private final GUIOptionPane p;
 
     /**

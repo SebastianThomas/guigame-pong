@@ -6,8 +6,14 @@ package guigame.logic.players;
  * @see Players#getPlayersArray()
  */
 public class Players {
+    /**
+     * Contains both players
+     */
     private final Player[] players;
 
+    /**
+     * The initial y-offset (for both players the same), should be almost centered
+     */
     private final int y;
 
     /**

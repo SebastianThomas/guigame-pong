@@ -6,6 +6,9 @@ import guigame.logic.main.Directions;
  * This {@code Exception} must be caught. It indicates that a {@code GameObject} is out of the game field.
  */
 public class OutOfFieldException extends Exception {
+    /**
+     * {@code Direction} this exception was thrown for
+     */
     Directions direction;
 
     /**

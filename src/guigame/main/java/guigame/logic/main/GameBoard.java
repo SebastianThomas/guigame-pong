@@ -43,6 +43,9 @@ public class GameBoard {
     private GameState gameState;
 
     // TODO: Implement further checkout for loop which is only assigned but not used
+    /**
+     * Whether the loop is currently going on or not.
+     */
     private boolean loop;
 
     /**
@@ -126,6 +129,7 @@ public class GameBoard {
     /**
      * Sets the new game state. Prefer the methods below over {@code setState}.
      *
+     * @param newState the new game state
      * @see GameBoard#pauseGame()
      * @see GameBoard#resumeGame()
      * @see GameBoard#resumeBetweenPoints()

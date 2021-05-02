@@ -11,9 +11,20 @@ import java.awt.event.MouseListener;
 /**
  * An implementation of {@code JButton}.
  * Has a specific fore- and background.
+ * May also be (un-)selected on click. Then, the fg-color changes.
+ *
+ * @see Constants#bgColor
+ * @see Constants#fgColor
+ * @see Constants#fgSelectedColor
  */
 public class BaseButton extends JButton implements MouseListener {
+    /**
+     * Whether this button is selected or not.
+     */
     private boolean selected;
+    /**
+     * Used font. Primarily for the font size.
+     */
     private Font font;
 
     /**
@@ -52,9 +63,11 @@ public class BaseButton extends JButton implements MouseListener {
      * - 20 to right and left.
      * </p>
      *
-     * @param msg      String to display on the button.
-     * @param fontSize Font size for this button.
-     * @param border   Create a dashed border if {@code border} is true.
+     * @param msg             String to display on the button.
+     * @param fontSize        Font size for this button.
+     * @param border          Create a dashed border if {@code border} is true.
+     * @param backgroundColor Background-color for the button. Should be the standard bg-color for most use cases.
+     * @see Constants#bgColor
      */
     public BaseButton(String msg, int fontSize, boolean border, Color backgroundColor) {
         super(msg);
@@ -75,6 +88,15 @@ public class BaseButton extends JButton implements MouseListener {
         }
     }
 
+    /**
+     * Select or unselect this button.
+     * Set the variable and apply the right color.
+     *
+     * @param selected new selection-state for the button
+     * @see BaseButton#selected
+     * @see Constants#fgColor
+     * @see Constants#fgSelectedColor
+     */
     public void setButtonSelected(boolean selected) {
         this.selected = selected;
 

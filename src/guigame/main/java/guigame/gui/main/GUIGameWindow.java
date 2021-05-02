@@ -16,19 +16,28 @@ import java.awt.event.KeyListener;
  *
  * @see guigame.gui.menu.GUIMainMenu
  */
-public class GameWindow extends GUIFrame implements KeyListener {
+public class GUIGameWindow extends GUIFrame implements KeyListener {
+    /**
+     * The windows {@code [0] = width} and {@code [1] = height}
+     */
     private final int[] size;
+    /**
+     * The {@code EventListener} to report keyboard presses to
+     */
     private final KeyboardPressedEventListener keyboardPressedEventListener;
 
     /**
-     * Creates a {@code GameWindow}. It shows a {@code MainMenu} and starts the game by a click on the {@code MainMenu}'s {@code StartGameBaseButton}.
+     * Creates a {@code GUIGameWindow}. It shows a {@code MainMenu} and starts the game by a click on the {@code MainMenu}'s {@code StartGameBaseButton}.
      *
-     * @see GameWindow#setMainMenu(MainMenu)
-     * @see GameWindow#setGameBoard(GameBoard)
+     * @param width                        the window's width
+     * @param height                       the window's height
+     * @param keyboardPressedEventListener The {@code EventListener} to report keyboard presses to
+     * @see GUIGameWindow#setMainMenu(MainMenu)
+     * @see GUIGameWindow#setGameBoard(GameBoard)
      * @see guigame.gui.panes.buttons.StartGameBaseButton
      * @see guigame.logic.event.StartGameEventListener
      */
-    public GameWindow(int width, int height, KeyboardPressedEventListener keyboardPressedEventListener) {
+    public GUIGameWindow(int width, int height, KeyboardPressedEventListener keyboardPressedEventListener) {
         super("Pont - Java GUI");
         this.size = new int[]{width, height};
 
@@ -81,7 +90,7 @@ public class GameWindow extends GUIFrame implements KeyListener {
     /**
      * Sets the {@code GameBoard} and creates a {@code GUIGameBoardWindow} which is shown.
      *
-     * @code gameBoard The {@code GameBoard} to show.
+     * @param gameBoard The {@code GameBoard} to show.
      */
     public void setGameBoard(GameBoard gameBoard) {
         // Hide

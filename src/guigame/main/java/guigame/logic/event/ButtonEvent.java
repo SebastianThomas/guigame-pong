@@ -4,6 +4,9 @@ package guigame.logic.event;
  * Implementation of the {@code Event} which should be fired when a button is pressed.
  */
 public class ButtonEvent implements Event {
+    /**
+     * String for which button has been pressed
+     */
     private final String button;
 
     /**

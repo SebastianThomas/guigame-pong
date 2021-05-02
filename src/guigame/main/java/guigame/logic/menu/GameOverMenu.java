@@ -18,14 +18,37 @@ import javax.swing.*;
  * @see GUIGameOverMenu
  */
 public class GameOverMenu extends Menu {
+    /**
+     * The opponents.
+     */
     private Players players;
+    /**
+     * Whichever player has won the last point (0,1).
+     */
     private int winner;
 
+    /**
+     * The {@code Event} to start a new point from.
+     */
     private StartGameEvent event;
+    /**
+     * The GUI-part of this menu
+     */
     private GUIGameOverMenu guiMenu;
 
+    /**
+     * Whether this menu has been initialized yet.
+     * Becomes {@code true} when the parametrized constructor OR {@code setParams()} is used.
+     *
+     * @see GameOverMenu#setParams(StartGameEventListener, Players, int)
+     */
     private boolean initialized;
 
+    /**
+     * The JFrame the gui-part belongs to.
+     *
+     * @see GameOverMenu#guiMenu
+     */
     private JFrame guiOwner;
 
     /**
@@ -44,9 +67,10 @@ public class GameOverMenu extends Menu {
     }
 
     /**
+     * <p>
      * Create a new GameOverMenu and set the parameters. Then show the window.
      * The all-in-one solution for:
-     * <p></p>
+     * </p>
      * <p>
      * {@code GameOverMenu g = new GameOverMenu();}
      * </p>
@@ -68,6 +92,13 @@ public class GameOverMenu extends Menu {
         this.setWindow();
     }
 
+    /**
+     * Set the params from here when the not-parametrized constructor was used.
+     *
+     * @param l       listener to notify when a new game should be started
+     * @param players the opponents
+     * @param winner  the index of the victorious player (0,1)
+     */
     public void setParams(StartGameEventListener l, Players players, int winner) {
         this.initialized = true;
 
@@ -116,6 +147,7 @@ public class GameOverMenu extends Menu {
     /**
      * Format a {@code String} to show which player has won.
      *
+     * @return a nice string to show which player has won
      * @see GameOverMenu#winner
      */
     public String getWinnerMessage() {

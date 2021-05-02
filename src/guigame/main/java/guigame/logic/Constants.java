@@ -36,21 +36,44 @@ public abstract class Constants {
     public static final int BALL_DIMENSION_SIZE = 30;
 
     // --------------------- COLORS ---------------------
+    /**
+     * {@code Color} for the background.
+     */
     public static final Color bgColor = new Color(0);
-    // Foreground colors
+    /**
+     * {@code Color} for unselected elements in the foreground.
+     *
+     * @see Constants#fgHoverColor
+     */
     public static final Color fgColor = new Color(255, 255, 255);
+    /**
+     * {@code Color} for unselected elements in the foreground when they are hovered over.
+     *
+     * @see Constants#fgColor
+     */
     public static final Color fgHoverColor = new Color(150, 150, 150);
-    // Foreground selected colors
+    /**
+     * {@code Color} for selected elements (buttons) in the foreground.
+     *
+     * @see Constants#fgHoverSelectedColor
+     */
     public static final Color fgSelectedColor = new Color(0, 255, 0);
+    /**
+     * {@code Color} for selected elements (buttons) in the foreground when they are hovered over.
+     *
+     * @see Constants#fgSelectedColor
+     */
     public static final Color fgHoverSelectedColor = new Color(100, 255, 100);
-    // Slider color
+    /**
+     * Color for the marked part (left of the thumb) of the sliders.
+     */
     public static final Color sliderMarkedColor = new Color(100, 100, 100);
     // ---------------------        ---------------------
 
     /**
      * End game at a max score of 5 points for one person
      */
-    public static int WINNING_SCORE = 1;
+    public static int WINNING_SCORE = 5;
 
     /**
      * The max speed of an AI player.
@@ -61,4 +84,11 @@ public abstract class Constants {
      * The ball's current x-speed, initial value: 3.
      */
     public static float BALL_X_SPEED = 3;
+
+    /**
+     * Utility class:
+     * must not be instantiated!
+     */
+    private Constants() {
+    }
 }

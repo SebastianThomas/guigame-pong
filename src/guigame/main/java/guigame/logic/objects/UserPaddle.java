@@ -107,6 +107,8 @@ public class UserPaddle extends GameObject {
     }
 
     /**
+     * @param difference the difference between the two coordinates
+     * @param maxSpeed   the maximum allowed speed for the paddle movement by an AI
      * @return The speed the coordinates should be subtracted or added to.
      */
     private int diffOrMaxSpeed(int difference, int maxSpeed) {
@@ -121,6 +123,8 @@ public class UserPaddle extends GameObject {
     }
 
     /**
+     * @param y          the y-offset of the paddle
+     * @param ballHeight the ball's height
      * @return Whether the current UserPaddle contains the ball's y-coordinates or not.
      */
     public boolean containsYBall(float y, int ballHeight) {

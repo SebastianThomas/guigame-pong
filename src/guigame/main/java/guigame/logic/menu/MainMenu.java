@@ -10,8 +10,17 @@ import guigame.logic.players.Players;
  * From here, the game can be started and settings can be changed.
  */
 public class MainMenu extends Menu {
+    /**
+     * The opponents.
+     */
     private final Players players;
+    /**
+     * Event to trigger as soon as the game should be started.
+     */
     private final StartGameEvent startGameEvent;
+    /**
+     * GUI-part of this menu.
+     */
     private GUIMainMenu guiMenu;
 
     /**

@@ -17,12 +17,28 @@ import java.awt.event.MouseMotionListener;
  * @see GUIGameBoard
  */
 public class GUIGameBoardWindow extends JWindow implements MouseMotionListener {
+    /**
+     * The {@code GUIGameBoard} to show on this window.
+     */
     GUIGameBoard guiGameBoard;
+    /**
+     * Whether the game board is shown or not.
+     */
     private boolean guiBoardShown;
 
+    /**
+     * Button to start the game with.
+     */
     private BaseButton startGameButton;
 
+    /**
+     * Label to show when the point is over.
+     * TODO: Not showing up yet.
+     */
     private JLabel pointWinningLabel;
+    /**
+     * Whether the label is currently in use or not.
+     */
     private boolean useLabel = false;
 
     /**
@@ -115,6 +131,11 @@ public class GUIGameBoardWindow extends JWindow implements MouseMotionListener {
         this.startGameButton.addActionListener(e -> this.startGameButtonActionListener(right));
     }
 
+    /**
+     * Start the game since the StartGame button was triggered.
+     *
+     * @param right whether the first point should start with the right player or not (so left player)
+     */
     private void startGameButtonActionListener(boolean right) {
         this.add(this.guiGameBoard);
         this.guiBoardShown = true;

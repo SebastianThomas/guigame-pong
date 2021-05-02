@@ -9,11 +9,15 @@ import guigame.gui.menu.submenus.GUISelectUsersSubmenu;
  * @see GUISelectUsersSubmenu
  */
 public class PlayersChangedEventListener implements EventListener {
+    /**
+     * SubMenu to notify on player change
+     */
     private final GUISelectUsersSubmenu subMenu;
 
     /**
      * Create a {@code PlayersChangedEventListener}. {@code actionPerformed} will then invoke {@code playersChanged} on a {@code GUISelectUsersSubmenu}.
      *
+     * @param subMenu the {@code GUISelectUsersSubmenu} to set users from (one or two players and their names)
      * @see PlayersChangedEventListener#actionPerformed(Event)
      * @see GUISelectUsersSubmenu#playersChanged(int)
      */

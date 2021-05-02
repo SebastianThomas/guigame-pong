@@ -15,8 +15,14 @@ public class GUISlider extends JSlider {
      * Creates a {@code GUISlider} in {@code HORIZONTAL} orientation.
      * It will have a {@code GUISliderUI} as UI.
      *
+     * @param min              Minimum value for the slider
+     * @param max              Maximum value for the slider
+     * @param value            Initial value
+     * @param majorTickSpacing Spacing between major ticks
+     * @param labels           All labels for the slider. Should have the same length as (max - min)
      * @see GUISliderUI
      * @see GUISlider#HORIZONTAL
+     * @see JSlider#majorTickSpacing
      */
     public GUISlider(int min, int max, int value, int majorTickSpacing, String... labels) {
         // Init a slider

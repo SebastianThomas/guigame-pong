@@ -16,6 +16,8 @@ import javax.swing.*;
 public class StartGame {
     /**
      * Starts the main menu.
+     *
+     * @param args the runtime arguments. Must not contain any additional information.
      */
     public static void main(String... args) {
         createMainGame();

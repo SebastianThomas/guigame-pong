@@ -4,7 +4,13 @@ package guigame.logic.main;
  * Holds an x- and a y-coordinate for objects on the GUI.
  */
 public class Coordinates {
+    /**
+     * The horizontal coordinate
+     */
     public float x;
+    /**
+     * The vertical coordinate
+     */
     public float y;
 
     /**

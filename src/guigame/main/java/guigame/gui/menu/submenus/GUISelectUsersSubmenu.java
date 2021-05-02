@@ -152,6 +152,9 @@ public class GUISelectUsersSubmenu extends GUIMenu {
         this.inputPanel.add(this.secondPlayerInput);
     }
 
+    /**
+     * @return the {@code GUIPanel} with the text fields of both player's names
+     */
     public GUIPanel getTextFieldPanel() {
         return this.inputPanel;
     }
@@ -211,6 +214,8 @@ public class GUISelectUsersSubmenu extends GUIMenu {
     /**
      * The name of one player is changed; this name is applied.
      *
+     * @param index   the index of the player whose name has been changed
+     * @param newName the new name of the player
      * @see GUISelectUsersSubmenu#playersChanged(int)
      * @see GUISelectUsersSubmenu#setButtonsSelected()
      */

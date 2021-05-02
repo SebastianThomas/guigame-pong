@@ -4,19 +4,44 @@ import guigame.logic.main.Coordinates;
 import guigame.logic.main.Directions;
 
 /**
- * A class implementing some logic for Positions. Does not affect the GUI!
+ * A class implementing some logic for Positions. Does not affect the GUI directly!
  */
 public class Position {
+    /**
+     * The current horizontal direction; either left or right.
+     *
+     * @see Directions#LEFT
+     * @see Directions#RIGHT
+     */
     public Directions xMovingDirection;
+    /**
+     * The current horizontal direction; either up or down.
+     *
+     * @see Directions#UP
+     * @see Directions#DOWN
+     */
     public Directions yMovingDirection;
 
+    /**
+     * The initial (x,y)-pair for the starting point (for the {@code GUIBall}: center of the screen)
+     *
+     * @see Position#resetCoordinates()
+     */
     private int[] initialPositions;
 
+    /**
+     * The current position's horizontal velocity
+     */
     private float xvelocity;
+    /**
+     * The current position's vertical velocity
+     */
     private float yvelocity;
 
+    /**
+     * The current position's coordinates: (x,y)-value pair
+     */
     private Coordinates coordinates;
-
 
     /**
      * Create a new Position with the velocities = 0 and
@@ -48,6 +73,9 @@ public class Position {
 
     /**
      * Sets the initial velocities, there where the ball is reseted to.
+     *
+     * @param x the initial x(horizontal)-position
+     * @param y the initial y(vertical)-position
      */
     public void setInitialPositions(int x, int y) {
         this.initialPositions = new int[]{x, y};
@@ -81,6 +109,7 @@ public class Position {
     /**
      * Set the x-velocity and x-moving-direction.
      *
+     * @param xvelocity the updated x-velocity
      * @see Position#getXvelocity()
      */
     public void setXvelocity(float xvelocity) {
@@ -100,6 +129,7 @@ public class Position {
     /**
      * Set the y-velocity and y-moving-direction.
      *
+     * @param yvelocity the updated y-velocity
      * @see Position#getYvelocity()
      */
     public void setYvelocity(float yvelocity) {
@@ -154,6 +184,11 @@ public class Position {
         this.setMovingDirections(this.xvelocity, this.yvelocity);
     }
 
+    /**
+     * Update the {@code Position}'s x-velocity (horizontal).
+     *
+     * @param toAdd the horizontal velocity to add
+     */
     public void updateXSpeed(float toAdd) {
         if (this.xvelocity < 0) {
             this.xvelocity -= toAdd;

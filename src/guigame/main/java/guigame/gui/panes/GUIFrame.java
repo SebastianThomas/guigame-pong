@@ -26,6 +26,9 @@ public class GUIFrame extends JFrame {
         this.initialize();
     }
 
+    /**
+     * Initialize the window with the default close operation, the location on the screen and its initial colors.
+     */
     private void initialize() {
         this.setLocationRelativeTo(null);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);

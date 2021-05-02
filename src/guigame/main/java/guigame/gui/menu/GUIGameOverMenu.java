@@ -19,12 +19,24 @@ import java.awt.*;
  * @see GameOverMenu
  */
 public class GUIGameOverMenu extends GUIMenu {
-    private Players players;
+    /**
+     * The logic menu
+     */
     private final GameOverMenu gameOverMenu;
+    /**
+     * Event to start a new game
+     */
     private final StartGameEvent startGameEvent;
-
+    /**
+     * The message to show
+     *
+     * @see GameOverMenu#getWinnerMessage()
+     */
     private final String msg;
-
+    /**
+     * The opponents (from which one has won)
+     */
+    private Players players;
     /**
      * Uses a "normal" {@code GridLayout} instead of the {@code GridBagLayout} from {@code GUIMenu}.
      *

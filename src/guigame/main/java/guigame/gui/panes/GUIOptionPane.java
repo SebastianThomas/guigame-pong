@@ -12,7 +12,15 @@ import java.awt.*;
  * Implementation of {@code GUIDialog}: Option pane to ask the user a question.
  */
 public class GUIOptionPane extends GUIDialog {
+    /**
+     * Layout to add components to.
+     */
     private final GridBagLayout layout;
+    /**
+     * Constraints to pass for each add.
+     * 
+     * @see GUIOptionPane#addComponent(JComponent, int, int, int, int) 
+     * */
     private final GridBagConstraints constraints;
 
     /**
@@ -61,6 +69,8 @@ public class GUIOptionPane extends GUIDialog {
      * <p>
      * Best: swing-Thread (Thread-secure {@code paint})!
      * </p>
+     *
+     * @param p The {@code GUIOptionPane} to set visible
      */
     private static void showOptionPane(GUIOptionPane p) {
         p.setVisible(true);
