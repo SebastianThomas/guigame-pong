@@ -585,11 +585,16 @@ public class GUIGameBoard extends GUIPanel implements KeyListener, KeyboardButto
         float paddleyCoord = this.paddles[paddle].getYCoordinate();
         float paddleycenter = paddleyCoord + (paddleHeight / 2);
 
+        float xSpeed = this.ball.getPosition().getXvelocity();
+
         // It is inversed since the positive difference should lead to a negative ball direction
         float ballPaddleDifference = -1 * (paddleycenter - ballycenter);
 
+        // ratio between maximum/current y-speed and current x-speed should always stay the same
+        float maxBallYSpeed = xSpeed / 3 * Constants.MAX_BALL_Y_SPEED;
+
         // Difference between negative max ball y-speed and positive max ball y-speed
-        return Constants.MAX_BALL_Y_SPEED * ballPaddleDifference / ((paddleHeight + ballHeight) / 2);
+        return maxBallYSpeed * ballPaddleDifference / ((paddleHeight + ballHeight) / 2);
     }
 
     /**
