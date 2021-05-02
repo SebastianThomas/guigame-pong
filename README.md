@@ -18,7 +18,7 @@ java -jar out/GUIGame-LAB.jar
 ```
 
 On Windows, you can use the following bash code (copy-paste it into a `.bat`-file):
-```
+```bat
 java -jar <ABSOLUTE_PATH_TO_PROJECT>\GUIGame-LAB\out\GUIGame-LAB.jar
 PAUSE
 ```
