@@ -19,4 +19,9 @@ Ebenfalls öfter hat ein zu kompliziertes Layout (z.B. `GridBagLayout`) zu Probl
 
 Als Lösung habe ich einfachere Layouts (z.B. `GridLayout`) genutzt, die einzelne `JPanel`s enthalten. Somit konnte ich das Problem in immer kleinere Probleme aufteilen. 
 
+### Label wird nicht angezeigt
+Eigentlich sollte, wenn ein Punkt vorbei ist, ein `JLabel` angezeigt werden, auf dem steht, welcher Spieler gewonnen hat. Trotz mehrerer Versuche herauszufinden, wieso es nicht angezeigt wird, habe ich das Problem noch nicht gefunden. 
+
+Daher habe ich das Problem auch noch nicht gelöst.
+
 ## Logik-Probleme
