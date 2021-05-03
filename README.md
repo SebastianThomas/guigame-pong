@@ -25,4 +25,6 @@ PAUSE
 
 ## Problems
 If you expreience the error "A JNI error has occurred", check out [WebDeEasy](https://webdeasy.de/en/error-a-jni-error-has-occured-how-to-fix-this-java-error/).
-This is most likely an error with your Java-installation.
+This is most likely an error with your Java-installation. 
+
+I fixed the problem by running the jar from the command line instead of running it from the explorer.
